@@ -2808,7 +2808,7 @@
         </setting>
         <setting id="general.addonnotifications" type="boolean" label="36609" help="36612">
           <level>0</level>
-          <default>false</default>
+          <default>true</default>
           <control type="toggle" />
           <dependencies>
             <dependency type="enable" setting="general.addonupdates">0</dependency>
@@ -2824,7 +2824,7 @@
         </setting>
         <setting id="addons.unknownsources" type="boolean" label="36615" help="36616">
           <level>0</level>
-          <default>false</default>
+          <default>true</default>
           <control type="toggle" />
         </setting>
       </group>
@@ -3054,7 +3054,7 @@
       <group id="1" label="24997">
         <setting id="lookandfeel.skin" type="addon" label="166" help="36103">
           <level>0</level>
-          <default>skin.estuary</default>
+          <default>skin.estuary.ogmc</default>
           <constraints>
             <addontype>xbmc.gui.skin</addontype>
           </constraints>
@@ -3386,7 +3386,7 @@
         </setting>
         <setting id="lookandfeel.enablerssfeeds" type="boolean" label="13305" help="36111">
           <level>0</level>
-          <default>false</default>
+          <default>true</default>
           <control type="toggle" />
         </setting>
         <setting id="lookandfeel.rssedit" type="string" parent="lookandfeel.enablerssfeeds" label="21450" help="36112">

@@ -28,7 +28,6 @@
   <addon>screensaver.xbmc.builtin.black</addon>
   <addon>screensaver.xbmc.builtin.dim</addon>
   <addon>script.module.pil</addon>
-  <addon>service.xbmc.versioncheck</addon>
   <addon>skin.estuary</addon>
   <addon>skin.estouchy</addon>
   <addon>webinterface.default</addon>
@@ -42,5 +41,11 @@
   <addon>xbmc.pvr</addon>
   <addon>xbmc.python</addon>
   <addon>xbmc.webinterface</addon>
+  <addon>inputstream.adaptive</addon>
+  <addon>inputstream.rtmp</addon> 
+  <addon>plugin.program.ogtools</addon>
+  <addon>repository.ogmcapp</addon>
+  <addon>service.ogmcupdater</addon>
+  <addon>skin.estuary.ogmc</addon>
   <addon optional="true">peripheral.joystick</addon>
 </addons>
