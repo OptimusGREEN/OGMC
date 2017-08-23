@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/xbmc/xbmc.svg?branch=master)](https://travis-ci.org/xbmc/xbmc)
+[![Build Status](https://travis-ci.tk/optimusgreen/xbmc.svg?branch=master)](https://travis-ci.tk/optimusgreen/xbmc)
 [![Documentation](https://codedocs.xyz/xbmc/xbmc.svg)](https://codedocs.xyz/xbmc/xbmc/)
 
 ![Kodi logo](https://raw.githubusercontent.com/xbmc/xbmc-forum/master/xbmc/images/logo-sbs-black.png)
