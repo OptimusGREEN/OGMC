@@ -9,17 +9,17 @@ endif()
 
 ### copy all the addon binding header files to include/kodi
 # make sure include/kodi exists and is empty
-set(APP_LIB_DIR ${ADDON_DEPENDS_PATH}/lib/${APP_NAME_LC})
+set(APP_LIB_DIR ${ADDON_DEPENDS_PATH}/lib/kodi)
 if(NOT EXISTS "${APP_LIB_DIR}/")
   file(MAKE_DIRECTORY ${APP_LIB_DIR})
 endif()
 
-set(APP_DATA_DIR ${ADDON_DEPENDS_PATH}/share/${APP_NAME_LC})
+set(APP_DATA_DIR ${ADDON_DEPENDS_PATH}/share/kodi)
 if(NOT EXISTS "${APP_DATA_DIR}/")
   file(MAKE_DIRECTORY ${APP_DATA_DIR})
 endif()
 
-set(APP_INCLUDE_DIR ${ADDON_DEPENDS_PATH}/include/${APP_NAME_LC})
+set(APP_INCLUDE_DIR ${ADDON_DEPENDS_PATH}/include/kodi)
 if(NOT EXISTS "${APP_INCLUDE_DIR}/")
   file(MAKE_DIRECTORY ${APP_INCLUDE_DIR})
 endif()
@@ -77,12 +77,16 @@ if(WIN32)
     # make sure the extraction worked and that patch.exe is there
     set(PATCH_PATH ${BUILD_DIR}/${PATCH_ARCHIVE_NAME})
     set(PATCH_BINARY_PATH ${PATCH_PATH}/bin/patch.exe)
+    set(PATCH_MANIFEST_PATH ${PATCH_PATH}/bin/patch.exe.manifest)
     if(NOT EXISTS ${PATCH_PATH} OR NOT EXISTS ${PATCH_BINARY_PATH})
       message(FATAL_ERROR "ERROR extracting patch utility from ${PATCH_DOWNLOAD_DIR}")
     endif()
 
     # copy patch.exe into the output directory
     file(INSTALL ${PATCH_BINARY_PATH} DESTINATION ${ADDON_DEPENDS_PATH}/bin)
+    if(EXISTS ${PATCH_MANIFEST_PATH})
+      file(INSTALL ${PATCH_MANIFEST_PATH} DESTINATION ${ADDON_DEPENDS_PATH}/bin)
+    endif()
 
     # make sure that cmake can find the copied patch.exe
     find_program(PATCH_FOUND NAMES patch patch.exe)
