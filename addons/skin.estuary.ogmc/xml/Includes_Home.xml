@@ -172,6 +172,8 @@
 		<param name="visible_2">true</param>
 		<param name="button2_label">$LOCALIZE[31085]</param>
 		<param name="button2_onclick">true</param>
+		<param name="button3_label">$LOCALIZE[310851]</param>
+		<param name="button3_onclick">true</param>
 		<definition>
 			<control type="group" id="$PARAM[button_id]889">
 				<visible>$PARAM[visible]</visible>
@@ -191,8 +193,8 @@
 					</control>
 					<control type="grouplist" id="$PARAM[button_id]567">
 						<width>100%</width>
-						<onup>9000</onup>
-						<ondown>9000</ondown>
+						<onup>$PARAM[button_id]5671</onup>
+						<ondown>$PARAM[button_id]5671</ondown>
 						<orientation>horizontal</orientation>
 						<align>center</align>
 						<onleft>9000</onleft>
@@ -205,6 +207,47 @@
 							<align>center</align>
 							<texturefocus border="23" colordiffuse="button_focus">buttons/dialogbutton-fo.png</texturefocus>
 							<texturenofocus border="40">buttons/dialogbutton-nofo.png</texturenofocus>
+							<onup>$PARAM[button_id]5681</onup>
+							<ondown>$PARAM[button_id]5681</ondown>
+							<visible>$PARAM[visible_2]</visible>
+						</control>
+					</control>
+				</control>
+			</control>
+			<control type="group" id="$PARAM[button_id]889">
+				<visible>$PARAM[visible]</visible>
+				<control type="grouplist" id="$PARAM[button_id]577">
+					<orientation>vertical</orientation>
+					<top>400</top>
+					<bottom>50</bottom>
+					<left>50</left>
+					<right>50</right>
+					<align>center</align>
+					<control type="textbox">
+						<width>100%</width>
+						<height min="0" max="300">auto</height>
+						<label>$PARAM[text_label2]</label>
+						<align>center</align>
+						<font>font14</font>
+					</control>
+					<control type="grouplist" id="$PARAM[button_id]5671">
+						<width>100%</width>
+						<onup>567</onup>
+						<ondown>567</ondown>
+						<orientation>horizontal</orientation>
+						<align>center</align>
+						<onleft>9000</onleft>
+						<control type="button" id="$PARAM[button_id]5681">
+							<width>auto</width>
+							<height>110</height>
+							<label>$PARAM[button3_label]</label>
+							<textoffsetx>40</textoffsetx>
+							<onclick>ActivateWindow(10001,&quot;plugin://plugin.program.ogtools/?description=Restore%20Your%20Full%20System&amp;fanart=https%3a%2f%2farchive.org%2fdownload%2fogmcapp_gmail_Ogt%2fArtwork%2fhubfanart1.jpg&amp;iconimage=https%3a%2f%2farchive.org%2fdownload%2fogmcapp_gmail_Ogt%2fArtwork%2fbacres2.png&amp;mode=menu_RESTORE&amp;name=%5bCOLORwhite%5dRestore%5b%2fCOLOR%5d&amp;url=url&quot;,return)</onclick>
+							<align>center</align>
+							<texturefocus border="23" colordiffuse="button_focus">buttons/dialogbutton-fo.png</texturefocus>
+							<texturenofocus border="40">buttons/dialogbutton-nofo.png</texturenofocus>
+							<onup>$PARAM[button_id]568</onup>
+							<ondown>$PARAM[button_id]568</ondown>
 							<visible>$PARAM[visible_2]</visible>
 						</control>
 					</control>

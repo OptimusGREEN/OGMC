@@ -389,6 +389,11 @@ msgctxt "#31085"
 msgid "INSTALL"
 msgstr ""
 
+#: /xml/Includes_Home.xml
+msgctxt "#310851"
+msgid "RESTORE"
+msgstr ""
+
 #: /xml/DialogPVRGroupManager.xml
 msgctxt "#31089"
 msgid "Available groups"
@@ -402,7 +407,12 @@ msgstr ""
 
 #: /xml/Home.xml
 msgctxt "#31091"
-msgid "Click To Install The OptimusGREEN Build."
+msgid "Install The OptimusGREEN Build."
+msgstr ""
+
+#: /xml/Home.xml
+msgctxt "#310911"
+msgid "Restore From Backup."
 msgstr ""
 
 #: /xml/VideoOSD.xml /xml/Variables.xml

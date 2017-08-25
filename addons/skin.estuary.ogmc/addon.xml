@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="skin.estuary.ogmc" version="0.0.4" name="Estuary OGMC Mod" provider-name="phil65, Ichabod Fletchman. Modded by TeamGREEN">
+<addon id="skin.estuary.ogmc" version="1.0.0" name="Estuary OGMC Mod" provider-name="phil65, Ichabod Fletchman. Modded by TeamGREEN">
 	<requires>
 		<import addon="xbmc.gui" version="5.12.0"/>
 	</requires>

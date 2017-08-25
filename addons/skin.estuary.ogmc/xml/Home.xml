@@ -96,12 +96,13 @@
 							<param name="list_id" value="25600"/>
 						</include>
 					</control>
-					<include content="OGMCWidget" condition="!Library.HasContent(movies)">
+					<include content="OGMCWidget" condition="System.HasAddon(repository.repo67)">
 						<param name="text_label" value="$LOCALIZE[31091]" />
 						<param name="button_label" value="$LOCALIZE[31110]" />
 						<param name="button_onclick" value="ActivateWindow(videos,files,return)"/>
 						<param name="button_id" value="25500"/>
 						<param name="button2_onclick" value="Skin.SetBool(HomeMenuNoInstallButton)"/>
+						<param name="text_label2" value="$LOCALIZE[310911]" />
 					</include>
 				</control>
 				<control type="group" id="5000">
@@ -864,7 +865,7 @@
 							<property name="menu_id">$NUMBER[17000]</property>
 							<thumb>icons/sidemenu/download.png</thumb>
 							<property name="id">install</property>
-							<visible>!Skin.HasSetting(HomeMenuNoInstallButton)</visible>
+							<visible>System.HasAddon(repository.repo67)</visible>
 						</item>
 						<item>
 							<label>$LOCALIZE[342]</label>
