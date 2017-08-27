@@ -242,7 +242,7 @@
 							<height>110</height>
 							<label>$PARAM[button3_label]</label>
 							<textoffsetx>40</textoffsetx>
-							<onclick>ActivateWindow(10001,&quot;plugin://plugin.program.ogtools/?description=Restore%20Your%20Full%20System&amp;fanart=https%3a%2f%2farchive.org%2fdownload%2fogmcapp_gmail_Ogt%2fArtwork%2fhubfanart1.jpg&amp;iconimage=https%3a%2f%2farchive.org%2fdownload%2fogmcapp_gmail_Ogt%2fArtwork%2fbacres2.png&amp;mode=menu_RESTORE&amp;name=%5bCOLORwhite%5dRestore%5b%2fCOLOR%5d&amp;url=url&quot;,return)</onclick>
+							<onclick>ActivateWindow(10001,&quot;plugin://plugin.program.ogtools/?description=No%20information%20available&amp;fanart=https%3a%2f%2farchive.org%2fdownload%2fogmcapp_gmail_Ogt%2fArtwork%2fhubfanart1.jpg&amp;iconimage=https%3a%2f%2farchive.org%2fdownload%2fogmcapp_gmail_Ogt%2fArtwork%2fbacres1.png&amp;mode=menu_BACRES&amp;name=%5bCOLORwhite%5dBackup%20%26%20Restore%5b%2fCOLOR%5d&amp;url=url&quot;,return)</onclick>
 							<align>center</align>
 							<texturefocus border="23" colordiffuse="button_focus">buttons/dialogbutton-fo.png</texturefocus>
 							<texturenofocus border="40">buttons/dialogbutton-nofo.png</texturenofocus>
