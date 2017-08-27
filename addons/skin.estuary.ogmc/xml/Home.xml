@@ -304,6 +304,16 @@
 							<param name="addon_submenu" value="true"/>
 						</include>
 						<include content="WidgetListSquare">
+							<param name="content_path" value="plugin://plugin.program.simple.favourites/"/>
+							<param name="widget_header" value="All Add-Ons"/>
+							<param name="widget_target" value="programs"/>
+							<param name="sortby" value="lastused"/>
+							<param name="sortorder" value="descending"/>
+							<param name="list_id" value="81001"/>
+							<param name="fallback_icon" value="DefaultAddon.png"/>
+							<visible>System.HasAddon(plugin.program.simple.favourites)</visible>
+						</include>
+						<include content="WidgetListSquare">
 							<param name="content_path" value="addons://sources/video/"/>
 							<param name="widget_header" value="$LOCALIZE[1037]"/>
 							<param name="widget_target" value="videos"/>
@@ -865,7 +875,7 @@
 							<property name="menu_id">$NUMBER[17000]</property>
 							<thumb>icons/sidemenu/download.png</thumb>
 							<property name="id">install</property>
-							<visible>System.HasAddon(repository.repo67)</visible>
+							<visible>!Skin.HasSetting(isBuildInstalled)</visible>
 						</item>
 						<item>
 							<label>$LOCALIZE[342]</label>
