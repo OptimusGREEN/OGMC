@@ -39,6 +39,8 @@ config.log
 *.apk
 *.class
 *.dwo
+*.pyc
+*.pyo
 
 # Windows specific generated files
 *.exp
