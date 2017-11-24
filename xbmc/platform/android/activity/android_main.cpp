@@ -134,12 +134,12 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
 
   std::string appName = CCompileInfo::GetAppName();
   StringUtils::ToLower(appName);
-  std::string mainClass = "org/xbmc/" + appName + "/Main";
-  std::string bcReceiver = "org/xbmc/" + appName + "/XBMCBroadcastReceiver";
-  std::string frameListener = "org/xbmc/" + appName + "/XBMCOnFrameAvailableListener";
-  std::string settingsObserver = "org/xbmc/" + appName + "/XBMCSettingsContentObserver";
-  std::string audioFocusChangeListener = "org/xbmc/" + appName + "/XBMCOnAudioFocusChangeListener";
-  std::string inputDeviceListener = "org/xbmc/" + appName + "/XBMCInputDeviceListener";
+  std::string mainClass = "tk/optimusgreen/" + appName + "/Main";
+  std::string bcReceiver = "tk/optimusgreen/" + appName + "/XBMCBroadcastReceiver";
+  std::string frameListener = "tk/optimusgreen/" + appName + "/XBMCOnFrameAvailableListener";
+  std::string settingsObserver = "tk/optimusgreen/" + appName + "/XBMCSettingsContentObserver";
+  std::string audioFocusChangeListener = "tk/optimusgreen/" + appName + "/XBMCOnAudioFocusChangeListener";
+  std::string inputDeviceListener = "tk/optimusgreen/" + appName + "/XBMCInputDeviceListener";
 
   jclass cMain = env->FindClass(mainClass.c_str());
   if(cMain)

@@ -16,7 +16,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.xbmc.eventclient;
+package tk.optimusgreen.eventclient;
 
 import java.io.FileInputStream;
 import java.io.IOException;
