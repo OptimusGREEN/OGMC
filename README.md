@@ -1,9 +1,10 @@
-![Kodi logo](https://archive.org/download/OGMCLatest/OgmcAppIcon512.png)
-# OGMC Home Theater Software (Kodi Fork)
+[![Build Status](https://travis-ci.org/xbmc/xbmc.svg?branch=master)](https://travis-ci.org/xbmc/xbmc)
+[![Documentation](https://codedocs.xyz/xbmc/xbmc.svg)](https://codedocs.xyz/xbmc/xbmc/)
 
-**Welcome to OGMC!**
+![Kodi logo](https://raw.githubusercontent.com/xbmc/xbmc-forum/master/xbmc/images/logo-sbs-black.png)
+# Kodi Home Theater Software
 
-OGMC is an unofficial fork of the tremendous Kodi (Formerly XBMC) media player.
+**Welcome to Kodi!**
 
 Kodi is an award-winning free and open source (GPL) software media player and
 entertainment hub for digital media. Kodi is available for multiple platforms.
