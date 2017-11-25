@@ -13,7 +13,7 @@ import common
 ############      GLOBAL VARIABLES    ##############
 ####################################################
 
-TESTING_MODE       = True
+TESTING_MODE       = False
 
 
 id_OGT             = 'plugin.program.ogtools'
