@@ -25,17 +25,20 @@ def check_addon_latest_ver(addonID, repo_addonsfile_url):
         return False
     urllib.urlretrieve(repo_addonsfile_url, saved)
     if os.path.exists(saved):
-        with open(saved) as f:
-            content = f.readlines()
-        for line in content:
-            line = line.strip('\n')
-            line = line.strip('\r')
-            if addonline in line:
-                prever = line.split('version="', 1)[1]
-                ver = prever.split('" provider', 1)[0]
-                f.close()
-                os.remove(saved)
-                return ver
+        try:
+            with open(saved) as f:
+                content = f.readlines()
+            for line in content:
+                line = line.strip('\n')
+                line = line.strip('\r')
+                if addonline in line:
+                    prever = line.split('version="', 1)[1]
+                    ver = prever.split('" provider', 1)[0]
+                    f.close()
+                    os.remove(saved)
+                    return ver
+        except:
+            xbmc.log("#################  OGMC Updater: check_addon_latest_ver: couldn't read file    #####################")
 
 
 def check_addon_current_ver(addonID):
