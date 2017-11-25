@@ -50,4 +50,4 @@ addons/metadata.tvdb.com/*
 addons/plugin.program.ogtools/*
 addons/repository.ogmcapp/*
 addons/service.ogmcupdater/*
-addons/skin.estuary.ogmc/*
+addons/skin.estuary.ogmc/*	  
