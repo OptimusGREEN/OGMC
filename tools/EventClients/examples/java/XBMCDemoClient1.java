@@ -1,10 +1,10 @@
-package org.xbmc.eventclient.demo;
+package tk.optimusgreen.eventclient.demo;
 
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 
-import org.xbmc.eventclient.XBMCClient;
+import tk.optimusgreen.eventclient.XBMCClient;
 
 /**
  * Simple Demo EventClient
