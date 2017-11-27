@@ -1,4 +1,4 @@
-package tk.optimusgreen.@APP_NAME_LC@;
+package org.xbmc.@APP_NAME_LC@;
 
 import android.graphics.SurfaceTexture;
 import android.graphics.SurfaceTexture.OnFrameAvailableListener;

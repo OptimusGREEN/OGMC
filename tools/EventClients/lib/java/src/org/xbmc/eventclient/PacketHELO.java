@@ -16,7 +16,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package tk.optimusgreen.eventclient;
+package org.xbmc.eventclient;
 import java.nio.charset.Charset;
 
 /**

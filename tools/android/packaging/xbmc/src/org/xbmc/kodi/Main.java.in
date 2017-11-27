@@ -1,4 +1,4 @@
-package tk.optimusgreen.@APP_NAME_LC@;
+package org.xbmc.@APP_NAME_LC@;
 
 import android.app.NativeActivity;
 import android.content.ComponentName;
@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Handler;
-import tk.optimusgreen.@APP_NAME_LC@.XBMCVideoView;
+import org.xbmc.@APP_NAME_LC@.XBMCVideoView;
 
 public class Main extends NativeActivity implements Choreographer.FrameCallback
 {

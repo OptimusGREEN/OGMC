@@ -1,4 +1,4 @@
-package tk.optimusgreen.@APP_NAME_LC@;
+package org.xbmc.@APP_NAME_LC@;
 
 import android.hardware.input.InputManager.InputDeviceListener;
 import android.util.Log;

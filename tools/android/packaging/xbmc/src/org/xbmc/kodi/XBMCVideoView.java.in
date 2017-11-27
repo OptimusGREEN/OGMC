@@ -1,4 +1,4 @@
-package tk.optimusgreen.@APP_NAME_LC@;
+package org.xbmc.@APP_NAME_LC@;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
