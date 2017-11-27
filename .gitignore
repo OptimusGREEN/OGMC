@@ -39,8 +39,6 @@ config.log
 *.apk
 *.class
 *.dwo
-*.pyc
-*.pyo
 
 # Windows specific generated files
 *.exp
@@ -321,14 +319,14 @@ lib/cpluff/stamp-h1
 /tools/android/packaging/Makefile
 /tools/android/packaging/xbmc/activity_main.xml
 /tools/android/packaging/xbmc/AndroidManifest.xml
-/tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/Main.java
-/tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/Splash.java
-/tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCBroadcastReceiver.java
-/tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCInputDeviceListener.java
-/tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCOnAudioFocusChangeListener.java
-/tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCOnFrameAvailableListener.java
-/tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCSettingsContentObserver.java
-/tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCVideoView.java
+/tools/android/packaging/xbmc/src/org/xbmc/kodi/Main.java
+/tools/android/packaging/xbmc/src/org/xbmc/kodi/Splash.java
+/tools/android/packaging/xbmc/src/org/xbmc/kodi/XBMCBroadcastReceiver.java
+/tools/android/packaging/xbmc/src/org/xbmc/kodi/XBMCInputDeviceListener.java
+/tools/android/packaging/xbmc/src/org/xbmc/kodi/XBMCOnAudioFocusChangeListener.java
+/tools/android/packaging/xbmc/src/org/xbmc/kodi/XBMCOnFrameAvailableListener.java
+/tools/android/packaging/xbmc/src/org/xbmc/kodi/XBMCSettingsContentObserver.java
+/tools/android/packaging/xbmc/src/org/xbmc/kodi/XBMCVideoView.java
 /tools/android/packaging/xbmc/strings.xml
 
 #/tools/depends
