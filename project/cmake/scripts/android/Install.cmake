@@ -26,14 +26,14 @@ file(WRITE ${CMAKE_BINARY_DIR}/tools/depends/Makefile.include
 set(package_files strings.xml
                   activity_main.xml
                   AndroidManifest.xml
-                  src/org/xbmc/kodi/XBMCOnAudioFocusChangeListener.java
-                  src/org/xbmc/kodi/XBMCInputDeviceListener.java
-                  src/org/xbmc/kodi/Main.java
-                  src/org/xbmc/kodi/XBMCSettingsContentObserver.java
-                  src/org/xbmc/kodi/XBMCOnFrameAvailableListener.java
-                  src/org/xbmc/kodi/XBMCVideoView.java
-                  src/org/xbmc/kodi/Splash.java
-                  src/org/xbmc/kodi/XBMCBroadcastReceiver.java)
+                  src/tk/optimusgreen/ogmc/XBMCOnAudioFocusChangeListener.java
+                  src/tk/optimusgreen/ogmc/XBMCInputDeviceListener.java
+                  src/tk/optimusgreen/ogmc/Main.java
+                  src/tk/optimusgreen/ogmc/XBMCSettingsContentObserver.java
+                  src/tk/optimusgreen/ogmc/XBMCOnFrameAvailableListener.java
+                  src/tk/optimusgreen/ogmc/XBMCVideoView.java
+                  src/tk/optimusgreen/ogmc/Splash.java
+                  src/tk/optimusgreen/ogmc/XBMCBroadcastReceiver.java)
 foreach(file IN LISTS package_files)
   configure_file(${CORE_SOURCE_DIR}/tools/android/packaging/xbmc/${file}.in
                  ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/${file} @ONLY)
