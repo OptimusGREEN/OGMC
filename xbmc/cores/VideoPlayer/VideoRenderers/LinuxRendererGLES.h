@@ -181,8 +181,7 @@ protected:
   void CalculateTextureSourceRects(int source, int num_planes);
 
   // renderers
-  void RenderToFBO(int index, int field, bool weave = false);
-  void RenderFromFBO();
+  void RenderMultiPass(int index, int field);     // multi pass glsl renderer
   void RenderSinglePass(int index, int field);    // single pass glsl renderer
   
   // hooks for HwDec Renderered
@@ -193,12 +192,7 @@ protected:
   virtual int  GetImageHook(YV12Image *image, int source = AUTOSOURCE, bool readonly = false) { return NOSOURCE; }
   virtual bool RenderUpdateCheckForEmptyField() { return true; }
 
-  struct
-  {
-    CFrameBufferObject fbo;
-    float width, height;
-  } m_fbo;
-  bool  m_nonLinStretch;
+  CFrameBufferObject m_fbo;
 
   int m_iYV12RenderBuffer;
   int m_NumYV12Buffers;
@@ -270,6 +264,10 @@ protected:
   // clear colour for "black" bars
   float m_clearColour;
 
+  // software scale libraries (fallback if required gl version is not available)
+  struct SwsContext *m_sw_context;
+  BYTE	      *m_rgbBuffer;  // if software scale is used, this will hold the result image
+  unsigned int m_rgbBufferSize;
   float        m_textureMatrix[16];
 };
 

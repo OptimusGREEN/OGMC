@@ -28,7 +28,7 @@
  *
  **********************************************************************/
 
-#include <stdio.h>
+#include <cstdio>
 #include <list>
 #include <map>
 #include <string>

@@ -27,6 +27,32 @@
 #include "URL.h"
 #include <map>
 
+static XbmcThreads::ThreadLocal<CFFmpegLog> CFFmpegLogTls;
+
+void CFFmpegLog::SetLogLevel(int level)
+{
+  CFFmpegLog::ClearLogLevel();
+  CFFmpegLog *log = new CFFmpegLog();
+  log->level = level;
+  CFFmpegLogTls.set(log);
+}
+
+int CFFmpegLog::GetLogLevel()
+{
+  CFFmpegLog* log = CFFmpegLogTls.get();
+  if (!log)
+    return -1;
+  return log->level;
+}
+
+void CFFmpegLog::ClearLogLevel()
+{
+  CFFmpegLog* log = CFFmpegLogTls.get();
+  CFFmpegLogTls.set(nullptr);
+  if (log)
+    delete log;
+}
+
 /* callback for the ffmpeg lock manager */
 int ffmpeg_lockmgr_cb(void **mutex, enum AVLockOp operation)
 {
@@ -88,7 +114,11 @@ void ff_avutil_log(void* ptr, int level, const char* format, va_list va)
 
   AVClass* avc= ptr ? *(AVClass**)ptr : NULL;
 
-  if (level > AV_LOG_ERROR &&
+  int maxLevel = AV_LOG_WARNING;
+  if (CFFmpegLog::GetLogLevel() > 0)
+    maxLevel = AV_LOG_INFO;
+
+  if (level > maxLevel &&
      !g_advancedSettings.CanLogComponent(LOGFFMPEG))
     return;
   else if (g_advancedSettings.m_logLevel <= LOG_LEVEL_NORMAL)
@@ -99,10 +129,6 @@ void ff_avutil_log(void* ptr, int level, const char* format, va_list va)
   {
     case AV_LOG_INFO:
       type = LOGINFO;
-      break;
-
-    case AV_LOG_WARNING:
-      type = LOGWARNING;
       break;
 
     case AV_LOG_ERROR:

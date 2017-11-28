@@ -3074,12 +3074,7 @@ msgctxt "#681"
 msgid "Verbose logging for the [B]Webserver[/B] component"
 msgstr ""
 
-#: xbmc/settings/AdvancedSettings.cpp
-msgctxt "#682"
-msgid "Verbose logging for the [B]Database[/B] component"
-msgstr ""
-
-#empty strings from id 683 to 699
+#empty strings from id 682 to 699
 
 msgctxt "#700"
 msgid "Cleaning up library"
@@ -4170,41 +4165,7 @@ msgctxt "#1260"
 msgid "Announce services to other systems"
 msgstr ""
 
-#: system/settings/settings.xml
-msgctxt "#1261"
-msgid "MySQL"
-msgstr ""
-
-#: system/settings/settings.xml
-msgctxt "#1262"
-msgid "Setup remote MySQL database connection"
-msgstr ""
-
-#: system/settings/settings.xml
-msgctxt "#1263"
-msgid "Enable/Disable MySQL setup"
-msgstr ""
-
-#: system/settings/settings.xml
-msgctxt "#1264"
-msgid "Define server port"
-msgstr ""
-
-#: system/settings/settings.xml
-msgctxt "#1265"
-msgid "Define video database name"
-msgstr ""
-
-#: system/settings/settings.xml
-msgctxt "#1266"
-msgid "Define music database name"
-msgstr ""
-
-#: system/settings/settings.xml
-msgctxt "#1267"
-msgid "Name to be used to connect to or create new database"
-msgstr ""
-
+#empty strings from id 1261 to 1267
 
 #: system/settings/settings.xml
 msgctxt "#1268"
@@ -4646,12 +4607,7 @@ msgctxt "#1450"
 msgid "Put display to sleep when idle"
 msgstr ""
 
-#: system/settings/settings.xml
-msgctxt "#1451"
-msgid "Clean Thumbnails..."
-msgstr ""
-
-#empty strings from id 1452 to 2049
+#empty strings from id 1451 to 2049
 #strings through to 1470 reserved for power-saving
 
 msgctxt "#2050"
@@ -5480,12 +5436,7 @@ msgctxt "#12373"
 msgid "Settings & file manager"
 msgstr ""
 
-#: unknown
-msgctxt "#12374"
-msgid "Loading database, please wait"
-msgstr ""
-
-#empty strings from id 12375
+#empty strings from id 12374 to 12375
 
 #: xbmc/settings/dialogs/GUIDialogAudioDSPSettings.cpp
 #: xbmc/video/dialogs/GUIDialogAudioSubtitleSettings.cpp
@@ -8561,7 +8512,7 @@ msgstr ""
 
 #: xbmc/video/dialogs/GUIDialogVideoSettings.cpp
 msgctxt "#16036"
-msgid "Yadif (half)"
+msgid "Deinterlace (half)"
 msgstr ""
 
 msgctxt "#16037"
@@ -12688,15 +12639,7 @@ msgctxt "#20471"
 msgid "Show empty TV shows"
 msgstr ""
 
-msgctxt "#20472"
-msgid "Import all videos"
-msgstr ""
-
-msgctxt "#20473"
-msgid "Import all videos, even if no scrapper data is available"
-msgstr ""
-
-#empty strings from id 20474 to 21329
+#empty strings from id 20472 to 21329
 #up to 21329 is reserved for the video db !! !
 
 #: system/settings/settings.xml
@@ -12765,12 +12708,7 @@ msgctxt "#21342"
 msgid "There are currently no updates available for this add-on."
 msgstr ""
 
-#empty strings from id 21343 to 21357
-
-#: system/settings/settings.xml
-msgctxt "#21358"
-msgid "Enable UPnP support"
-msgstr ""
+#empty strings from id 21343 to 21358
 
 #: xbmc/dialogs/GUIDialogFileBrowser.cpp
 msgctxt "#21359"
@@ -16441,15 +16379,7 @@ msgctxt "#36012"
 msgid "Couldn't initialise the CEC adapter. Please check your settings."
 msgstr ""
 
-#: xbmc/peripherals/devices/peripheralcecadapter.cpp
-msgctxt "#36013"
-msgid "User,password and host must be set,"
-msgstr ""
-
-#: xbmc/peripherals/devices/peripheralcecadapter.cpp
-msgctxt "#36014"
-msgid "disabling MYSQL configuration"
-msgstr ""
+#empty strings from id 36013 to 36014
 
 #: system/peripherals.xml
 msgctxt "#36015"
@@ -19142,34 +19072,40 @@ msgstr ""
 #. Description of setting with label #36621 "Maximum protocol version"
 #: system/settings/settings.xml
 msgctxt "#36622"
-msgid "Set the maximum SMB protocol version that can be negotiated (default SMBv3). Reduce to SMBv2 or SMBv1 for compatibility with older NAS and Windows shares if required."
+msgid "Set the maximum SMB protocol version to negotiate when making connections. Forcing SMBv2 or SMBv1 compatibility may be required with older NAS and Windows shares."
 msgstr ""
 
-#. Values for setting with label #36621 "Maximum protocol version"
+#. Values for setting with label #36621 "Maximum protocol version" - none means "no protocol version is forced"
 #: system/settings/settings.xml
 msgctxt "#36623"
-msgid "SMBv1"
+msgid "None"
 msgstr ""
 
 #. Values for setting with label #36621 "Maximum protocol version"
 #: system/settings/settings.xml
 msgctxt "#36624"
-msgid "SMBv2"
+msgid "SMBv1"
 msgstr ""
 
 #. Values for setting with label #36621 "Maximum protocol version"
 #: system/settings/settings.xml
 msgctxt "#36625"
+msgid "SMBv2"
+msgstr ""
+
+#. Values for setting with label #36621 "Maximum protocol version"
+#: system/settings/settings.xml
+msgctxt "#36626"
 msgid "SMBv3"
 msgstr ""
 
 #. Label of a group, that allows configuration of the system SMB client
 #: system/settings/settings.xml
-msgctxt "#36626"
+msgctxt "#36627"
 msgid "Client"
 msgstr ""
 
-#empty strings from id 36627 to 36899
+#empty strings from id 36628 to 36899
 
 #: xbmc/media/MediaType.cpp
 msgctxt "#36900"
@@ -19489,27 +19425,7 @@ msgctxt "#37045"
 msgid "Extract chapter thumbnails for presentation in the chapters / bookmarks dialogue. This might increase CPU load."
 msgstr ""
 
-#: system/settings/settings.xml
-msgctxt "#37046"
-msgid "Remove dangling thumbnails."
-msgstr ""
-
-#empty strings from id 37047 to 38007
-
-#: system/settings/settings.xml
-msgctxt "#38007"
-msgid "Boost centre channel when downmixing"
-msgstr ""
-
-#: system/settings/settings.xml
-msgctxt "#38008"
-msgid "Increase this value to make the dialogue louder compared to background sounds when downmixing multichannel audio"
-msgstr ""
-
-#: system/settings/settings.xml
-msgctxt "#38009"
-msgid "%i dB"
-msgstr ""
+#empty strings from id 37046 to 38009
 
 #: system/settings/rbp.xml
 msgctxt "#38010"
@@ -19564,21 +19480,7 @@ msgctxt "#38018"
 msgid "My rating"
 msgstr ""
 
-#. Setting #38019 "Settings -> System -> Audio output -> Support 8 channel DTS-HD audio decoding"
-#: system/settings/settings.xml
-msgctxt "#38019"
-msgid "Support 8 channel DTS-HD audio decoding"
-msgstr ""
-
-#. Description of setting #38019 Settings -> System -> Audio output -> Support 8 channel DTS-HD audio decoding
-#: system/settings/settings.xml
-msgctxt "#38020"
-msgid "Enables decoding of high quality DTS-HD audio streams. Note: This increases CPU load and is only available when DTS and DTS-HD audio passthrough are disabled."
-msgstr ""
-
-msgctxt "#38021"
-msgid "Info"
-msgstr ""
+#empty strings from id 38019 to 38021
 
 #. Used for the viewstate selection
 #: xbmc/video/dialogs/GUIDialogVideoInfo.cpp
@@ -19885,29 +19787,3 @@ msgstr ""
 msgctxt "#39010"
 msgid "Select sort method"
 msgstr ""
-
-msgctxt "#39011"
-msgid "Accelerate hevc"
-msgstr ""
-
-msgctxt "#39104"
-msgid "Export"
-msgstr ""
-
-msgctxt "#39105"
-msgid "Exports nfo, thumbnail & fanart near the media file"
-msgstr ""
-
-msgctxt "#39106"
-msgid "Upload debug log..."
-msgstr ""
-
-msgctxt "#39107"
-msgid "Upload the current debug log"
-msgstr ""
-
-#: system/settings/android.xml
-msgctxt "#39108"
-msgid "1080"
-msgstr ""
-

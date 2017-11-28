@@ -28,7 +28,6 @@
 #include "utils/Variant.h"
 #include "video/VideoDatabase.h"
 #include "video/VideoLibraryQueue.h"
-#include "filesystem/File.h"
 
 using namespace JSONRPC;
 using namespace KODI::MESSAGING;
@@ -1031,36 +1030,14 @@ JSONRPC_STATUS CVideoLibrary::RemoveVideo(const CVariant &parameterObject)
   if (!videodatabase.Open())
     return InternalError;
 
-  std::string filePath;
-  bool bDeleteFile = parameterObject["deletefile"].asBoolean();;
   if (parameterObject.isMember("movieid"))
-  {
-    int itemId = (int)parameterObject["movieid"].asInteger();
-    if (bDeleteFile)
-      videodatabase.GetFilePathById(itemId, filePath, VIDEODB_CONTENT_MOVIES);
-    videodatabase.DeleteMovie(itemId);
-  }
+    videodatabase.DeleteMovie((int)parameterObject["movieid"].asInteger());
   else if (parameterObject.isMember("tvshowid"))
-  {
     videodatabase.DeleteTvShow((int)parameterObject["tvshowid"].asInteger());
-  }
   else if (parameterObject.isMember("episodeid"))
-  {
-    int itemId = (int)parameterObject["episodeid"].asInteger();
-    if (bDeleteFile)
-      videodatabase.GetFilePathById(itemId, filePath, VIDEODB_CONTENT_EPISODES);
     videodatabase.DeleteEpisode((int)parameterObject["episodeid"].asInteger());
-  }
   else if (parameterObject.isMember("musicvideoid"))
-  {
-    int itemId = (int)parameterObject["musicvideoid"].asInteger();
-    if (bDeleteFile)
-      videodatabase.GetFilePathById(itemId, filePath, VIDEODB_CONTENT_MUSICVIDEOS);
     videodatabase.DeleteMusicVideo((int)parameterObject["musicvideoid"].asInteger());
-  }
-
-  if (!filePath.empty())
-    XFILE::CFile::Delete(filePath);
 
   CJSONRPCUtils::NotifyItemUpdated();
   return ACK;

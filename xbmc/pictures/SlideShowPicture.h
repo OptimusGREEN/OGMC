@@ -62,7 +62,6 @@ public:
 
   int GetWidth() const { return (int)m_fWidth;};
   int GetHeight() const { return (int)m_fHeight;};
-  float GetScale() const { return m_fScale; }
 
   void Keep();
   bool StartTransistion();
@@ -107,7 +106,6 @@ private:
   float m_fPosX;
   float m_fPosY;
   float m_fPosZ;
-  float m_fScale;
   float m_fVelocityX;
   float m_fVelocityY;
   float m_fVelocityZ;

@@ -18,13 +18,6 @@ SRCS      += GraphicBuffer.cpp
 SRCS      += EventLoop.cpp
 SRCS      += XBMCApp.cpp
 SRCS      += JNIMainActivity.cpp
-SRCS      += JNIXBMCVideoView.cpp
-SRCS      += JNIXBMCAudioManagerOnAudioFocusChangeListener.cpp
-SRCS      += JNIXBMCSurfaceTextureOnFrameAvailableListener.cpp
-SRCS      += JNIXBMCNsdManagerDiscoveryListener.cpp
-SRCS      += JNIXBMCNsdManagerRegistrationListener.cpp
-SRCS      += JNIXBMCNsdManagerResolveListener.cpp
-SRCS      += JNIXBMCMediaSession.cpp
 
 OBJS      += $(APP_GLUE) $(CPU_OBJ)
 

@@ -63,7 +63,6 @@ set(SOURCES AddonsDirectory.cpp
             UDFDirectory.cpp
             UDFFile.cpp
             VideoDatabaseDirectory.cpp
-            VideoDatabaseFile.cpp
             VirtualDirectory.cpp
             XbtDirectory.cpp
             XbtFile.cpp

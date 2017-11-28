@@ -53,10 +53,6 @@
 #if defined(TARGET_DARWIN_IOS)
 #include "SettingAddon.h"
 #endif
-#if defined(TARGET_ANDROID)
-  #include "SettingAddon.h"
-  #include "platform/android/activity/AndroidFeatures.h"
-#endif
 #if defined(TARGET_RASPBERRY_PI)
 #include "linux/RBP.h"
 #endif
@@ -142,7 +138,6 @@ const std::string CSettings::SETTING_VIDEOLIBRARY_GROUPMOVIESETS = "videolibrary
 const std::string CSettings::SETTING_VIDEOLIBRARY_GROUPSINGLEITEMSETS = "videolibrary.groupsingleitemsets";
 const std::string CSettings::SETTING_VIDEOLIBRARY_UPDATEONSTARTUP = "videolibrary.updateonstartup";
 const std::string CSettings::SETTING_VIDEOLIBRARY_BACKGROUNDUPDATE = "videolibrary.backgroundupdate";
-const std::string CSettings::SETTING_VIDEOLIBRARY_IMPORTALL = "videolibrary.importall";
 const std::string CSettings::SETTING_VIDEOLIBRARY_CLEANUP = "videolibrary.cleanup";
 const std::string CSettings::SETTING_VIDEOLIBRARY_EXPORT = "videolibrary.export";
 const std::string CSettings::SETTING_VIDEOLIBRARY_IMPORT = "videolibrary.import";
@@ -163,6 +158,9 @@ const std::string CSettings::SETTING_VIDEOPLAYER_QUITSTEREOMODEONSTOP = "videopl
 const std::string CSettings::SETTING_VIDEOPLAYER_RENDERMETHOD = "videoplayer.rendermethod";
 const std::string CSettings::SETTING_VIDEOPLAYER_HQSCALERS = "videoplayer.hqscalers";
 const std::string CSettings::SETTING_VIDEOPLAYER_USEAMCODEC = "videoplayer.useamcodec";
+const std::string CSettings::SETTING_VIDEOPLAYER_USEAMCODECMPEG2 = "videoplayer.useamcodecmpeg2";
+const std::string CSettings::SETTING_VIDEOPLAYER_USEAMCODECMPEG4 = "videoplayer.useamcodecmpeg4";
+const std::string CSettings::SETTING_VIDEOPLAYER_USEAMCODECH264 = "videoplayer.useamcodech264";
 const std::string CSettings::SETTING_VIDEOPLAYER_USEMEDIACODEC = "videoplayer.usemediacodec";
 const std::string CSettings::SETTING_VIDEOPLAYER_USEMEDIACODECSURFACE = "videoplayer.usemediacodecsurface";
 const std::string CSettings::SETTING_VIDEOPLAYER_USEVDPAU = "videoplayer.usevdpau";
@@ -181,10 +179,6 @@ const std::string CSettings::SETTING_VIDEOPLAYER_USEOMX = "videoplayer.useomx";
 const std::string CSettings::SETTING_VIDEOPLAYER_USEVTB = "videoplayer.usevtb";
 const std::string CSettings::SETTING_VIDEOPLAYER_USEMMAL = "videoplayer.usemmal";
 const std::string CSettings::SETTING_VIDEOPLAYER_USESTAGEFRIGHT = "videoplayer.usestagefright";
-const std::string CSettings::SETTING_VIDEOPLAYER_ACCELMPEG2 = "videoplayer.accelmpeg2";
-const std::string CSettings::SETTING_VIDEOPLAYER_ACCELMPEG4 = "videoplayer.accelmpeg4";
-const std::string CSettings::SETTING_VIDEOPLAYER_ACCELH264 = "videoplayer.accelh264";
-const std::string CSettings::SETTING_VIDEOPLAYER_ACCELHEVC = "videoplayer.accelhevc";
 const std::string CSettings::SETTING_VIDEOPLAYER_LIMITGUIUPDATE = "videoplayer.limitguiupdate";
 const std::string CSettings::SETTING_VIDEOPLAYER_SUPPORTMVC = "videoplayer.supportmvc";
 const std::string CSettings::SETTING_MYVIDEOS_SELECTACTION = "myvideos.selectaction";
@@ -314,7 +308,6 @@ const std::string CSettings::SETTING_WEATHER_CURRENTLOCATION = "weather.currentl
 const std::string CSettings::SETTING_WEATHER_ADDON = "weather.addon";
 const std::string CSettings::SETTING_WEATHER_ADDONSETTINGS = "weather.addonsettings";
 const std::string CSettings::SETTING_SERVICES_DEVICENAME = "services.devicename";
-const std::string CSettings::SETTING_SERVICES_UPNP = "services.upnp";
 const std::string CSettings::SETTING_SERVICES_UPNPSERVER = "services.upnpserver";
 const std::string CSettings::SETTING_SERVICES_UPNPANNOUNCE = "services.upnpannounce";
 const std::string CSettings::SETTING_SERVICES_UPNPLOOKFOREXTERNALSUBTITLES = "services.upnplookforexternalsubtitles";
@@ -404,7 +397,6 @@ const std::string CSettings::SETTING_DEBUG_SHOWLOGINFO = "debug.showloginfo";
 const std::string CSettings::SETTING_DEBUG_EXTRALOGGING = "debug.extralogging";
 const std::string CSettings::SETTING_DEBUG_SETEXTRALOGLEVEL = "debug.setextraloglevel";
 const std::string CSettings::SETTING_DEBUG_SCREENSHOTPATH = "debug.screenshotpath";
-const std::string CSettings::SETTING_DEBUG_UPLOADLOG = "debug.uploadlog";
 const std::string CSettings::SETTING_EVENTLOG_ENABLED = "eventlog.enabled";
 const std::string CSettings::SETTING_EVENTLOG_ENABLED_NOTIFICATIONS = "eventlog.enablednotifications";
 const std::string CSettings::SETTING_EVENTLOG_SHOW = "eventlog.show";
@@ -432,15 +424,6 @@ const std::string CSettings::SETTING_GENERAL_ADDONBROKENFILTER = "general.addonb
 const std::string CSettings::SETTING_SOURCE_VIDEOS = "source.videos";
 const std::string CSettings::SETTING_SOURCE_MUSIC = "source.music";
 const std::string CSettings::SETTING_SOURCE_PICTURES = "source.pictures";
-const std::string CSettings::SETTING_THUMBNAILS_CLEANUP = "thumbnails.cleanup";
-
-const std::string CSettings::SETTING_MYSQL_ENABLED = "mysql.enabled";
-const std::string CSettings::SETTING_MYSQL_HOST = "mysql.host";
-const std::string CSettings::SETTING_MYSQL_PORT = "mysql.port";
-const std::string CSettings::SETTING_MYSQL_USER = "mysql.user";
-const std::string CSettings::SETTING_MYSQL_PASS = "mysql.pass";
-const std::string CSettings::SETTING_MYSQL_VIDEO = "mysql.video";
-const std::string CSettings::SETTING_MYSQL_MUSIC = "mysql.music";
 
 CSettings::CSettings()
   : m_initialized(false)
@@ -483,7 +466,7 @@ bool CSettings::Initialize()
 
   m_settingsManager->SetInitialized();
 
-  InitializeISettingsHandlers();
+  InitializeISettingsHandlers();  
   InitializeISubSettings();
   InitializeISettingCallbacks();
 
@@ -789,46 +772,6 @@ bool CSettings::LoadSetting(const TiXmlNode *node, const std::string &settingId)
   return m_settingsManager->LoadSetting(node, settingId);
 }
 
-bool CSettings::HasCondition(const std::string &id)
-{
-  return m_settingsManager->GetConditions().Check("isdefined", id);
-}
-
-std::vector<CVariant> CSettings::ListToValues(const CSettingList *setting, const std::vector< std::shared_ptr<CSetting> > &values)
-{
-  std::vector<CVariant> realValues;
-
-  if (setting == NULL)
-    return realValues;
-
-  for (SettingPtrList::const_iterator it = values.begin(); it != values.end(); ++it)
-  {
-    switch (setting->GetElementType())
-    {
-      case SettingTypeBool:
-        realValues.push_back(static_cast<const CSettingBool*>(it->get())->GetValue());
-        break;
-
-      case SettingTypeInteger:
-        realValues.push_back(static_cast<const CSettingInt*>(it->get())->GetValue());
-        break;
-
-      case SettingTypeNumber:
-        realValues.push_back(static_cast<const CSettingNumber*>(it->get())->GetValue());
-        break;
-
-      case SettingTypeString:
-        realValues.push_back(static_cast<const CSettingString*>(it->get())->GetValue());
-        break;
-
-      default:
-        break;
-    }
-  }
-
-  return realValues;
-}
-
 bool CSettings::Initialize(const std::string &file)
 {
   CXBMCTinyXML xmlDoc;
@@ -839,7 +782,7 @@ bool CSettings::Initialize(const std::string &file)
   }
 
   CLog::Log(LOGDEBUG, "CSettings: loaded settings definition from %s", file.c_str());
-
+  
   TiXmlElement *root = xmlDoc.RootElement();
   if (root == NULL)
     return false;
@@ -942,18 +885,6 @@ void CSettings::InitializeVisibility()
 void CSettings::InitializeDefaults()
 {
   // set some default values if necessary
-#if defined(HAS_TOUCH_SKIN)
-  bool default_touch_skin = false;
-#if defined(TARGET_DARWIN_IOS)
-  default_touch_skin = true;
-#endif
-#if defined(TARGET_ANDROID)
-  default_touch_skin = CAndroidFeatures::HasTouchScreen();
-#endif
-  if (default_touch_skin)
-    ((CSettingAddon*)m_settingsManager->GetSetting(CSettings::SETTING_LOOKANDFEEL_SKIN))->SetDefault("skin.estouchy");
-#endif
-
 #if defined(TARGET_POSIX)
   CSettingString* timezonecountry = (CSettingString*)m_settingsManager->GetSetting(CSettings::SETTING_LOCALE_TIMEZONECOUNTRY);
   CSettingString* timezone = (CSettingString*)m_settingsManager->GetSetting(CSettings::SETTING_LOCALE_TIMEZONE);
@@ -1097,13 +1028,6 @@ void CSettings::InitializeISettingCallbacks()
   settingSet.insert(CSettings::SETTING_DEBUG_SHOWLOGINFO);
   settingSet.insert(CSettings::SETTING_DEBUG_EXTRALOGGING);
   settingSet.insert(CSettings::SETTING_DEBUG_SETEXTRALOGLEVEL);
-  settingSet.insert(CSettings::SETTING_MYSQL_ENABLED);
-  settingSet.insert(CSettings::SETTING_MYSQL_HOST);
-  settingSet.insert(CSettings::SETTING_MYSQL_PORT);
-  settingSet.insert(CSettings::SETTING_MYSQL_USER);
-  settingSet.insert(CSettings::SETTING_MYSQL_PASS);
-  settingSet.insert(CSettings::SETTING_MYSQL_VIDEO);
-  settingSet.insert(CSettings::SETTING_MYSQL_MUSIC);
   m_settingsManager->RegisterCallback(&g_advancedSettings, settingSet);
 
   settingSet.clear();
@@ -1113,11 +1037,9 @@ void CSettings::InitializeISettingCallbacks()
   settingSet.insert(CSettings::SETTING_MUSICFILES_TRACKFORMAT);
   settingSet.insert(CSettings::SETTING_VIDEOLIBRARY_FLATTENTVSHOWS);
   settingSet.insert(CSettings::SETTING_VIDEOLIBRARY_GROUPMOVIESETS);
-  settingSet.insert(CSettings::SETTING_VIDEOLIBRARY_IMPORTALL);
   settingSet.insert(CSettings::SETTING_VIDEOLIBRARY_CLEANUP);
   settingSet.insert(CSettings::SETTING_VIDEOLIBRARY_IMPORT);
   settingSet.insert(CSettings::SETTING_VIDEOLIBRARY_EXPORT);
-  settingSet.insert(CSettings::SETTING_THUMBNAILS_CLEANUP);
   m_settingsManager->RegisterCallback(&CMediaSettings::GetInstance(), settingSet);
 
   settingSet.clear();
@@ -1129,7 +1051,7 @@ void CSettings::InitializeISettingCallbacks()
   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_3DLUT);
   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_DISPLAYPROFILE);
   m_settingsManager->RegisterCallback(&CDisplaySettings::GetInstance(), settingSet);
-
+  
   settingSet.clear();
   settingSet.insert(CSettings::SETTING_VIDEOPLAYER_SEEKDELAY);
   settingSet.insert(CSettings::SETTING_VIDEOPLAYER_SEEKSTEPS);
@@ -1185,7 +1107,6 @@ void CSettings::InitializeISettingCallbacks()
   settingSet.insert(CSettings::SETTING_SOURCE_VIDEOS);
   settingSet.insert(CSettings::SETTING_SOURCE_MUSIC);
   settingSet.insert(CSettings::SETTING_SOURCE_PICTURES);
-  settingSet.insert(CSettings::SETTING_DEBUG_UPLOADLOG);
   m_settingsManager->RegisterCallback(&g_application, settingSet);
 
   settingSet.clear();
@@ -1229,7 +1150,6 @@ void CSettings::InitializeISettingCallbacks()
   settingSet.insert(CSettings::SETTING_SERVICES_AIRPLAYVIDEOSUPPORT);
   settingSet.insert(CSettings::SETTING_SERVICES_USEAIRPLAYPASSWORD);
   settingSet.insert(CSettings::SETTING_SERVICES_AIRPLAYPASSWORD);
-  settingSet.insert(CSettings::SETTING_SERVICES_UPNP);
   settingSet.insert(CSettings::SETTING_SERVICES_UPNPSERVER);
   settingSet.insert(CSettings::SETTING_SERVICES_UPNPRENDERER);
   settingSet.insert(CSettings::SETTING_SERVICES_UPNPCONTROLLER);
@@ -1298,7 +1218,7 @@ bool CSettings::Reset()
   // try to delete the settings file
   if (XFILE::CFile::Exists(settingsFile, false) && !XFILE::CFile::Delete(settingsFile))
     CLog::Log(LOGWARNING, "Unable to delete old settings file at %s", settingsFile.c_str());
-
+  
   // unload any loaded settings
   Unload();
 

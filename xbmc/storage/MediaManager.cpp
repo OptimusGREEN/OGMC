@@ -216,15 +216,12 @@ void CMediaManager::GetNetworkLocations(VECSOURCES &locations, bool autolocation
 #endif// HAS_FILESYSTEM_NFS
 
 #ifdef HAS_UPNP
-    if (CSettings::GetInstance().GetBool(CSettings::SETTING_SERVICES_UPNP))
-    {
-      std::string strDevices = g_localizeStrings.Get(33040); //"% Devices"
-      share.strPath = "upnp://";
-      share.strName = StringUtils::Format(strDevices.c_str(), "UPnP"); //"UPnP Devices"
-      locations.push_back(share);
-    }
+    std::string strDevices = g_localizeStrings.Get(33040); //"% Devices"
+    share.strPath = "upnp://";
+    share.strName = StringUtils::Format(strDevices.c_str(), "UPnP"); //"UPnP Devices"
+    locations.push_back(share);
 #endif
-
+    
 #ifdef HAS_ZEROCONF
     share.strPath = "zeroconf://";
     share.strName = g_localizeStrings.Get(20262);

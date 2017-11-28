@@ -559,8 +559,6 @@ bool CVideoPlayerVideo::ProcessDecoderOutput(int &decoderState, double &frametim
   {
     // try to retrieve the picture (should never fail!), unless there is a demuxer bug ofcours
     m_pVideoCodec->ClearPicture(&m_picture);
-
-    m_picture.clock = m_pClock;
     if (m_pVideoCodec->GetPicture(&m_picture))
     {
       bool hasTimestamp = true;
@@ -893,21 +891,6 @@ int CVideoPlayerVideo::OutputPicture(const DVDVideoPicture* src, double pts)
   m_renderManager.FlipPage(m_bAbortOutput, pts, deintMethod, mDisplayField, (m_syncState == ESyncState::SYNC_STARTING));
 
   return result;
-}
-
-std::string CVideoPlayerVideo::GetCodecInfo()
-{
-  std::ostringstream s;
-  int w, h;
-  m_processInfo.GetVideoDimensions(w, h);
-
-  s << "vc:"   << m_processInfo.GetVideoDecoderName();
-  s << ", pf:"   << m_processInfo.GetVideoPixelFormat();
-  s << ", sz:" << w << "x" << h;
-  s << ", ar:"     << std::fixed << std::setprecision(2) << m_processInfo.GetVideoDAR();
-  s << ", di:"   << m_processInfo.GetVideoDeintMethod();
-
-  return s.str();
 }
 
 std::string CVideoPlayerVideo::GetPlayerInfo()

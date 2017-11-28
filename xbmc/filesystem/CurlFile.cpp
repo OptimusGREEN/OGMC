@@ -871,100 +871,24 @@ void CCurlFile::ParseAndCorrectUrl(CURL &url2)
     m_url = url2.Get();
 }
 
-bool CCurlFile::Delete(const std::string& strURL, const std::string& strData, std::string& strHTML)
-{
-  CURL url2(strURL);
-  ParseAndCorrectUrl(url2);
-
-  assert(m_state->m_easyHandle == NULL);
-  g_curlInterface.easy_aquire(
-    url2.GetProtocol().c_str(), url2.GetHostName().c_str(), &m_state->m_easyHandle, NULL);
-
-  SetCommonOptions(m_state);
-  SetRequestHeaders(m_state);
-
-  g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_CUSTOMREQUEST, "DELETE");
-  // grrr, not in curl docs but use CURLOPT_POSTFIELDS for content body.
-  if (!strData.empty())
-    g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_POSTFIELDS, strData.c_str());
-
-  CURLcode result = g_curlInterface.easy_perform(m_state->m_easyHandle);
-  if (result != CURLE_OK)
-  {
-    long code;
-    if (g_curlInterface.easy_getinfo(m_state->m_easyHandle, CURLINFO_RESPONSE_CODE, &code) == CURLE_OK)
-      CLog::Log(LOGERROR, "CCurlFile::Delete - Failed: HTTP returned error %ld for %s", code, url2.GetRedacted().c_str());
-  }
-
-  g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_CUSTOMREQUEST, NULL);
-  g_curlInterface.easy_release(&m_state->m_easyHandle, NULL);
-
-  return result == CURLE_OK;
-}
-
-bool CCurlFile::Put(const CURL& url2, const std::string& strData, std::string& strHTML)
-{
-  assert(m_state->m_easyHandle == NULL);
-  g_curlInterface.easy_aquire(
-    url2.GetProtocol().c_str(), url2.GetHostName().c_str(), &m_state->m_easyHandle, NULL);
-
-  SetCommonOptions(m_state);
-  SetRequestHeaders(m_state);
-
-  g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_CUSTOMREQUEST, "PUT");
-  // grrr, not in curl docs but use CURLOPT_POSTFIELDS for content body.
-  if (!strData.empty())
-    g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_POSTFIELDS, strData.c_str());
-
-  CURLcode result = g_curlInterface.easy_perform(m_state->m_easyHandle);
-  if (result != CURLE_OK)
-  {
-    long code;
-    if (g_curlInterface.easy_getinfo(m_state->m_easyHandle, CURLINFO_RESPONSE_CODE, &code) == CURLE_OK)
-      CLog::Log(LOGERROR, "CCurlFile::Put - Failed: HTTP returned error %ld for %s", code, url2.GetRedacted().c_str());
-  }
-  g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_CUSTOMREQUEST, NULL);
-  g_curlInterface.easy_release(&m_state->m_easyHandle, NULL);
-
-  return result == CURLE_OK;
-}
-
-bool CCurlFile::Put(const std::string& strURL, const std::string& strData, std::string& strHTML)
-{
-  CURL url2(strURL);
-  ParseAndCorrectUrl(url2);
-  return Put(url2, strData, strHTML);
-}
-
-bool CCurlFile::Post(const CURL& strURL, const std::string& strPostData, std::string& strHTML)
+bool CCurlFile::Post(const std::string& strURL, const std::string& strPostData, std::string& strHTML)
 {
   m_postdata = strPostData;
   m_postdataset = true;
   return Service(strURL, strHTML);
 }
 
-bool CCurlFile::Post(const std::string& strURL, const std::string& strPostData, std::string& strHTML)
-{
-  const CURL pathToUrl(strURL);
-  return Post(pathToUrl, strPostData, strHTML);
-}
-
-bool CCurlFile::Get(const CURL& strURL, std::string& strHTML)
+bool CCurlFile::Get(const std::string& strURL, std::string& strHTML)
 {
   m_postdata = "";
   m_postdataset = false;
   return Service(strURL, strHTML);
 }
 
-bool CCurlFile::Get(const std::string& strURL, std::string& strHTML)
+bool CCurlFile::Service(const std::string& strURL, std::string& strHTML)
 {
   const CURL pathToUrl(strURL);
-  return Get(pathToUrl, strHTML);
-}
-
-bool CCurlFile::Service(const CURL& strURL, std::string& strHTML)
-{
-  if (Open(strURL))
+  if (Open(pathToUrl))
   {
     if (ReadData(strHTML))
     {
@@ -1161,7 +1085,6 @@ bool CCurlFile::Open(const CURL& url)
     }
     m_url = efurl;
   }
-  m_lastEffectiveUrl = m_url;
 
   return true;
 }
@@ -1192,7 +1115,6 @@ bool CCurlFile::OpenForWrite(const CURL& url, bool bOverWrite)
   char* efurl;
   if (CURLE_OK == g_curlInterface.easy_getinfo(m_state->m_easyHandle, CURLINFO_EFFECTIVE_URL,&efurl) && efurl)
     m_url = efurl;
-  m_lastEffectiveUrl = m_url;
 
   m_opened = true;
   m_forWrite = true;
@@ -1854,11 +1776,6 @@ void CCurlFile::SetRequestHeader(const std::string& header, const std::string& v
 void CCurlFile::SetRequestHeader(const std::string& header, long value)
 {
   m_requestheaders[header] = StringUtils::Format("%ld", value);
-}
-
-std::string CCurlFile::GetLastEffectiveUrl()
-{
-  return m_lastEffectiveUrl;
 }
 
 std::string CCurlFile::GetServerReportedCharset(void)

@@ -141,10 +141,8 @@ void CAppParamParser::ParseArg(const std::string &arg)
   {
     if (m_testmode)
       g_application.SetEnableTestMode(true);
-
     CFileItemPtr pItem(new CFileItem(arg));
     pItem->SetPath(arg);
-
     m_playlist.Add(pItem);
   }
 }

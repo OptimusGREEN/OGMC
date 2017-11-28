@@ -60,7 +60,6 @@ class CGUIDialogKeyboardGeneric : public CGUIDialog, public CGUIKeyboard
     void OnLayout();
     void OnSymbols();
     void OnIPAddress();
-    void OnVoiceRecognition();
     void OnOK();
 
   private:

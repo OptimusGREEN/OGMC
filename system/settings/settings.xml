@@ -108,6 +108,72 @@
           </updates>
           <control type="toggle" />
         </setting>
+        <setting id="videoplayer.useamcodecmpeg2" type="integer" label="39001" >
+          <requirement>HAVE_AMCODEC</requirement>
+          <level>2</level>
+          <default>0</default>
+          <constraints>
+            <options>
+              <option label="20420">9999</option>   <!-- Never -->
+              <option label="39000">800</option>  <!-- HD -->
+              <option label="20422">0</option>  <!-- Always -->
+            </options>
+          </constraints>
+          <updates>
+            <update type="change" />
+          </updates>
+          <dependencies>
+            <dependency type="enable">
+              <condition setting="videoplayer.useamcodec" operator="is">true</condition> <!-- USE AMCODEC -->
+            </dependency>
+          </dependencies>
+          <control type="spinner" format="string" />
+          <control type="edit" format="integer" />
+        </setting>
+        <setting id="videoplayer.useamcodecmpeg4" type="integer" label="39002">
+          <requirement>HAVE_AMCODEC</requirement>
+          <level>2</level>
+          <default>800</default>
+          <constraints>
+            <options>
+              <option label="20420">9999</option>   <!-- Never -->
+              <option label="39000">800</option>  <!-- HD -->
+              <option label="20422">0</option>  <!-- Always -->
+            </options>
+          </constraints>
+          <updates>
+            <update type="change" />
+          </updates>
+          <dependencies>
+            <dependency type="enable">
+              <condition setting="videoplayer.useamcodec" operator="is">true</condition> <!-- USE AMCODEC -->
+            </dependency>
+          </dependencies>
+          <control type="spinner" format="string" />
+          <control type="edit" format="integer" />
+        </setting>
+        <setting id="videoplayer.useamcodech264" type="integer" label="39003">
+          <requirement>HAVE_AMCODEC</requirement>
+          <level>2</level>
+          <default>0</default>
+          <constraints>
+            <options>
+              <option label="20420">9999</option>   <!-- Never -->
+              <option label="39000">800</option>  <!-- HD -->
+              <option label="20422">0</option>  <!-- Always -->
+            </options>
+          </constraints>
+          <updates>
+            <update type="change" />
+          </updates>
+          <dependencies>
+            <dependency type="enable">
+              <condition setting="videoplayer.useamcodec" operator="is">true</condition> <!-- USE AMCODEC -->
+            </dependency>
+          </dependencies>
+          <control type="spinner" format="string" />
+          <control type="edit" format="integer" />
+        </setting>
         <setting id="videoplayer.usemediacodecsurface" type="boolean" label="13440" help="36544">
           <requirement>HAS_MEDIACODEC</requirement>
           <level>2</level>
@@ -125,130 +191,6 @@
             <update type="change" />
           </updates>
           <control type="toggle" />
-        </setting>
-        <setting id="videoplayer.accelmpeg2" type="integer" label="39001" >
-          <requirement>
-            <or>
-              <condition>HAVE_AMCODEC</condition>
-              <condition>HAS_MEDIACODEC</condition>
-            </or>
-          </requirement>
-          <level>2</level>
-          <default>800</default>
-          <constraints>
-            <options>
-              <option label="20420">9999</option>   <!-- Never -->
-              <option label="39000">800</option>  <!-- HD -->
-              <option label="20422">0</option>  <!-- Always -->
-            </options>
-          </constraints>
-          <updates>
-            <update type="change" />
-          </updates>
-          <dependencies>
-            <dependency type="enable">
-              <or>
-                <condition setting="videoplayer.useamcodec" operator="is">true</condition> <!-- USE AMCODEC -->
-                <condition setting="videoplayer.usemediacodecsurface" operator="is">true</condition>
-                <condition setting="videoplayer.usemediacodec" operator="is">true</condition>
-              </or>
-            </dependency>
-          </dependencies>
-          <control type="spinner" format="string" />
-          <control type="edit" format="integer" />
-        </setting>
-        <setting id="videoplayer.accelmpeg4" type="integer" label="39002">
-          <requirement>
-            <or>
-              <condition>HAVE_AMCODEC</condition>
-              <condition>HAS_MEDIACODEC</condition>
-            </or>
-          </requirement>
-          <level>2</level>
-          <default>800</default>
-          <constraints>
-            <options>
-              <option label="20420">9999</option>   <!-- Never -->
-              <option label="39000">800</option>  <!-- HD -->
-              <option label="20422">0</option>  <!-- Always -->
-            </options>
-          </constraints>
-          <updates>
-            <update type="change" />
-          </updates>
-          <dependencies>
-            <dependency type="enable">
-              <or>
-                <condition setting="videoplayer.useamcodec" operator="is">true</condition> <!-- USE AMCODEC -->
-                <condition setting="videoplayer.usemediacodecsurface" operator="is">true</condition>
-                <condition setting="videoplayer.usemediacodec" operator="is">true</condition>
-              </or>
-            </dependency>
-          </dependencies>
-          <control type="spinner" format="string" />
-          <control type="edit" format="integer" />
-        </setting>
-        <setting id="videoplayer.accelh264" type="integer" label="39003">
-          <requirement>
-            <or>
-              <condition>HAVE_AMCODEC</condition>
-              <condition>HAS_MEDIACODEC</condition>
-            </or>
-          </requirement>
-          <level>2</level>
-          <default>0</default>
-          <constraints>
-            <options>
-              <option label="20420">9999</option>   <!-- Never -->
-              <option label="39000">800</option>  <!-- HD -->
-              <option label="20422">0</option>  <!-- Always -->
-            </options>
-          </constraints>
-          <updates>
-            <update type="change" />
-          </updates>
-          <dependencies>
-            <dependency type="enable">
-              <or>
-                <condition setting="videoplayer.useamcodec" operator="is">true</condition> <!-- USE AMCODEC -->
-                <condition setting="videoplayer.usemediacodecsurface" operator="is">true</condition>
-                <condition setting="videoplayer.usemediacodec" operator="is">true</condition>
-              </or>
-            </dependency>
-          </dependencies>
-          <control type="spinner" format="string" />
-          <control type="edit" format="integer" />
-        </setting>
-        <setting id="videoplayer.accelhevc" type="integer" label="39011">
-          <requirement>
-            <or>
-              <condition>HAVE_AMCODEC</condition>
-              <condition>HAS_MEDIACODEC</condition>
-            </or>
-          </requirement>
-          <level>2</level>
-          <default>0</default>
-          <constraints>
-            <options>
-            <option label="20420">9999</option>   <!-- Never -->
-            <option label="39000">800</option>  <!-- HD -->
-            <option label="20422">0</option>  <!-- Always -->
-            </options>
-          </constraints>
-          <updates>
-            <update type="change" />
-          </updates>
-          <dependencies>
-            <dependency type="enable">
-              <or>
-                <condition setting="videoplayer.useamcodec" operator="is">true</condition> <!-- USE AMCODEC -->
-                <condition setting="videoplayer.usemediacodecsurface" operator="is">true</condition>
-                <condition setting="videoplayer.usemediacodec" operator="is">true</condition>
-              </or>
-            </dependency>
-          </dependencies>
-          <control type="spinner" format="string" />
-          <control type="edit" format="integer" />
         </setting>
         <setting id="videoplayer.usevdpau" type="boolean" label="13425" help="36155">
           <requirement>HAVE_LIBVDPAU</requirement>
@@ -926,10 +868,6 @@
           <level>2</level>
           <control type="button" format="action" />
         </setting>
-        <setting id="thumbnails.cleanup" type="action" label="1451" help="37046">
-          <level>2</level>
-          <control type="button" format="action" />
-        </setting>
         <setting id="videolibrary.export" type="action" label="14248" help="36149">
           <level>2</level>
           <control type="button" format="action" />
@@ -937,11 +875,6 @@
         <setting id="videolibrary.import" type="action" label="14249" help="36150">
           <level>2</level>
           <control type="button" format="action" />
-        </setting>
-        <setting id="videolibrary.importall" type="boolean" label="20472" help="20473">
-          <level>1</level>
-          <default>false</default>
-          <control type="toggle" />
         </setting>
       </group>
       <group id="3" label="14237">
@@ -1774,7 +1707,7 @@
       <requirement>HAS_WEB_SERVER</requirement>
         <setting id="services.webserver" type="boolean" label="263" help="36328">
           <level>1</level>
-          <default>true</default>
+          <default>false</default>
           <control type="toggle" />
         </setting>
         <setting id="services.webserverport" type="integer" parent="services.webserver" label="730" help="36329">
@@ -1925,29 +1858,16 @@
     <category id="upnp" label="20187" help="36322">
       <requirement>HAS_UPNP</requirement>
       <group id="1" label="16000">
-        <setting id="services.upnp" type="boolean" label="21358">
+        <setting id="services.upnpserver" type="boolean" label="21360" help="36323">
           <level>0</level>
           <default>false</default>
-          <control type="toggle" />
-        </setting>
-        <setting id="services.upnpserver" type="boolean" parent="services.upnp" label="21360" help="36323">
-          <level>0</level>
-          <default>false</default>
-          <dependencies>
-            <dependency type="enable" setting="services.upnp">true</dependency>
-          </dependencies>
           <control type="toggle" />
         </setting>
         <setting id="services.upnpannounce" type="boolean" parent="services.upnpserver" label="20188" help="36324">
           <level>2</level>
           <default>true</default>
           <dependencies>
-            <dependency type="enable">
-              <and>
-                <condition setting="services.upnp" operator="is">true</condition>
-                <condition setting="services.upnpserver" operator="is">true</condition>
-              </and>
-            </dependency>
+            <dependency type="enable" setting="services.upnpserver">true</dependency>
           </dependencies>
           <control type="toggle" />
         </setting>
@@ -1955,12 +1875,7 @@
           <level>2</level>
           <default>false</default>
           <dependencies>
-            <dependency type="enable">
-              <and>
-                <condition setting="services.upnp" operator="is">true</condition>
-                <condition setting="services.upnpserver" operator="is">true</condition>
-              </and>
-            </dependency>
+            <dependency type="enable" setting="services.upnpserver">true</dependency>
           </dependencies>
           <control type="toggle" />
         </setting>
@@ -1968,21 +1883,13 @@
           <level>2</level>
           <default>false</default>
           <dependencies>
-            <dependency type="enable">
-              <and>
-                <condition setting="services.upnp" operator="is">true</condition>
-                <condition setting="services.upnpserver" operator="is">true</condition>
-              </and>
-            </dependency>
+            <dependency type="enable" setting="services.upnpserver">true</dependency>
           </dependencies>
           <control type="toggle" />
         </setting>
         <setting id="services.upnprenderer" type="boolean" label="21881" help="36325">
           <level>1</level>
           <default>false</default>
-          <dependencies>
-            <dependency type="enable" setting="services.upnp">true</dependency>
-          </dependencies>
           <control type="toggle" />
         </setting>
       </group>
@@ -2034,82 +1941,6 @@
         </setting>
       </group>
     </category>
-    <category id="mysql" label="1261" help="1262">
-      <group id="1">
-        <setting id="mysql.enabled" type="boolean" label="24022" help="1263">
-          <level>1</level>
-          <default>false</default>
-          <control type="toggle" />
-        </setting>
-        <setting id="mysql.host" type="string" label="706" help="1016">
-        <dependencies>
-            <dependency type="enable">
-                <condition on="property" operator="!is" name="enablemysqlgui" />
-            </dependency>
-          </dependencies>
-          <level>1</level>
-          <constraints>
-            <allowempty>true</allowempty>
-          </constraints>
-          <control type="edit" format="string" />
-        </setting>
-        <setting id="mysql.port" type="string" label="730" help="1264">
-        <dependencies>
-            <dependency type="enable">
-                <condition on="property" operator="!is" name="enablemysqlgui" />
-            </dependency>
-          </dependencies>	
-          <level>1</level>
-          <default>3306</default>
-          <constraints>
-            <minimum>1</minimum>
-            <step>1</step>
-            <maximum>65535</maximum>
-          </constraints>
-          <control type="edit" format="integer" />
-        </setting>
-        <setting id="mysql.user" type="string" label="20142" help="1019">
-        <dependencies>
-            <dependency type="enable">
-                <condition on="property" operator="!is" name="enablemysqlgui" />
-            </dependency>
-          </dependencies> 	
-          <level>1</level>
-          <constraints>
-            <allowempty>true</allowempty>
-          </constraints>
-          <control type="edit" format="string" />
-        </setting> 
-        <setting id="mysql.pass" type="string" label="15052" help="12326">
-        <dependencies>
-            <dependency type="enable">
-                <condition on="property" operator="!is" name="enablemysqlgui" />
-            </dependency>
-          </dependencies>	
-          <level>1</level>
-          <constraints>
-            <allowempty>true</allowempty>
-          </constraints>
-          <control type="edit" format="string" />
-        </setting>                        
-      </group>
-      <group id="2">
-        <setting id="mysql.video" type="string" label="1265" help="1267">
-          <level>1</level>
-          <constraints>
-            <allowempty>true</allowempty>
-          </constraints>
-          <control type="edit" format="string" />
-        </setting> 
-        <setting id="mysql.music" type="string" label="1266" help="1267">
-          <level>1</level>
-          <constraints>
-            <allowempty>true</allowempty>
-          </constraints>
-          <control type="edit" format="string" />
-        </setting> 
-      </group>	
-    </category>
     <category id="smb" label="1200" help="36346">
       <requirement>HAS_FILESYSTEM_SMB</requirement>
       <group id="1" label="16000">
@@ -2119,7 +1950,7 @@
           <control type="edit" format="string" />
         </setting>
       </group>
-      <group id="2" label="36626">
+      <group id="2" label="36627">
         <setting id="smb.winsserver" type="string" label="1207" help="36347">
           <level>2</level>
           <default>0.0.0.0</default>
@@ -2127,12 +1958,14 @@
         </setting>
         <setting id="smb.maxprotocol" type="integer" label="36621" help="36622">
           <level>2</level>
-          <default>3</default>
+          <visible>false</visible>
+          <default>0</default>
           <constraints>
             <options>
-              <option label="36623">1</option>
-              <option label="36624">2</option>
-              <option label="36625">3</option>
+              <option label="36623">0</option>
+              <option label="36624">1</option>
+              <option label="36625">2</option>
+              <option label="36626">3</option>
             </options>
           </constraints>
           <control type="list" format="integer" />
@@ -2540,18 +2373,6 @@
             <dependency type="visible" on="property" name="aesettingvisible" setting="audiooutput.channels">audiooutput.stereoupmix</dependency>
           </dependencies>
           <control type="toggle" />
-        </setting>
-         <setting id="audiooutput.boostcenter" type="integer" label="38007" help="38008">
-          <level>2</level>
-          <default>0</default>
-          <constraints>
-            <minimum>0</minimum>
-            <step>1</step>
-            <maximum>30</maximum>
-          </constraints>
-          <control type="spinner" format="string">
-            <formatlabel>38009</formatlabel>
-          </control>
         </setting>
         <setting id="audiooutput.processquality" type="integer" label="13505" help="36169">
           <requirement>HAS_AE_QUALITY_LEVELS</requirement>
@@ -2987,7 +2808,7 @@
         </setting>
         <setting id="general.addonnotifications" type="boolean" label="36609" help="36612">
           <level>0</level>
-          <default>false</default>
+          <default>true</default>
           <control type="toggle" />
           <dependencies>
             <dependency type="enable" setting="general.addonupdates">0</dependency>
@@ -3003,7 +2824,7 @@
         </setting>
         <setting id="addons.unknownsources" type="boolean" label="36615" help="36616">
           <level>0</level>
-          <default>false</default>
+          <default>true</default>
           <control type="toggle" />
         </setting>
       </group>
@@ -3233,7 +3054,7 @@
       <group id="1" label="24997">
         <setting id="lookandfeel.skin" type="addon" label="166" help="36103">
           <level>0</level>
-          <default>skin.estuary</default>
+          <default>skin.estuary.ogmc</default>
           <constraints>
             <addontype>xbmc.gui.skin</addontype>
           </constraints>
@@ -3565,7 +3386,7 @@
         </setting>
         <setting id="lookandfeel.enablerssfeeds" type="boolean" label="13305" help="36111">
           <level>0</level>
-          <default>false</default>
+          <default>true</default>
           <control type="toggle" />
         </setting>
         <setting id="lookandfeel.rssedit" type="string" parent="lookandfeel.enablerssfeeds" label="21450" help="36112">

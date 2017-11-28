@@ -42,11 +42,6 @@ void CWinSystemOSXGL::PresentRenderImpl(bool rendered)
   if (rendered)
     FlushBuffer();
   
-  // FlushBuffer does not block if window is obscured
-  // in this case we need to throttle the render loop
-  if (IsObscured())
-    usleep(10000);
-
   if (m_delayDispReset && m_dispResetTimer.IsTimePast())
   {
     m_delayDispReset = false;

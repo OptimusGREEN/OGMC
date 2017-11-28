@@ -26,10 +26,8 @@
 #include "platform/android/activity/XBMCApp.h"
 #include "DVDCodecs/Video/DVDVideoCodecAndroidMediaCodec.h"
 #include "utils/log.h"
-#include "utils/TimeUtils.h"
 
 CRendererMediaCodecSurface::CRendererMediaCodecSurface()
-  : m_prevTime(0)
 {
 }
 
@@ -113,10 +111,13 @@ bool CRendererMediaCodecSurface::LoadShadersHook()
   return true;
 }
 
-bool CRendererMediaCodecSurface::RenderUpdateVideoHook(bool clear, DWORD flags, DWORD alpha)
+bool CRendererMediaCodecSurface::RenderHook(int index)
 {
-  CDVDMediaCodecInfo *mci = static_cast<CDVDMediaCodecInfo *>(m_buffers[m_iYV12RenderBuffer].hwDec);
-  if (mci)
+  glClearColor(0,0,0,0);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  CDVDMediaCodecInfo *mci = static_cast<CDVDMediaCodecInfo *>(m_buffers[index].hwDec);
+  if (mci && !mci->IsReleased())
   {
     // this hack is needed to get the 2D mode of a 3D movie going
     RENDER_STEREO_MODE stereo_mode = g_graphicsContext.GetStereoMode();
@@ -208,20 +209,8 @@ bool CRendererMediaCodecSurface::RenderUpdateVideoHook(bool clear, DWORD flags, 
         break;
     }
 
-    mci->RenderUpdate(dstRect);
-    CXBMCApp::WaitVSync(50);
+    mci->RenderUpdate(srcRect, dstRect);
   }
-  else
-  {
-    double sleep_time_ms = 1000.0 * (CurrentHostCounter() - m_prevTime) / CurrentHostFrequency();
-    m_prevTime = CurrentHostCounter();
-    if (sleep_time_ms < 20.0)
-    {
-      sleep_time_ms = 20.0 - sleep_time_ms;
-      usleep(sleep_time_ms * 1000);
-    }
-  }
-
   return true;
 }
 

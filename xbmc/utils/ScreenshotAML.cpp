@@ -43,8 +43,7 @@ void CScreenshotAML::CaptureVideoFrame(unsigned char *buffer, int iWidth, int iH
   int captureFd = open(CAPTURE_DEVICEPATH, O_RDWR, 0);
   if (captureFd >= 0)
   {
-    int stride = ((iWidth + 31) & ~31) * 3;
-    int buffSize = stride * iHeight;
+    int buffSize = iWidth * iHeight * 3;
     int readSize = 0;
     // videobuffer should be rgb according to docu - but it is bgr ...
     unsigned char *videoBuffer = new unsigned char[buffSize];
@@ -52,7 +51,7 @@ void CScreenshotAML::CaptureVideoFrame(unsigned char *buffer, int iWidth, int iH
     if (videoBuffer != NULL)
     {
       // configure destination
-      ioctl(captureFd, AMVIDEOCAP_IOW_SET_WANTFRAME_WIDTH, stride / 3);
+      ioctl(captureFd, AMVIDEOCAP_IOW_SET_WANTFRAME_WIDTH, iWidth);
       ioctl(captureFd, AMVIDEOCAP_IOW_SET_WANTFRAME_HEIGHT, iHeight);
       readSize = pread(captureFd, videoBuffer, buffSize, 0);
     }
@@ -61,35 +60,33 @@ void CScreenshotAML::CaptureVideoFrame(unsigned char *buffer, int iWidth, int iH
 
     if (readSize == buffSize)
     {
+      unsigned char *videoPtr = videoBuffer;
+
       if (!bBlendToBuffer)
       {
         memset(buffer, 0xff, buffSize);
       }
 
-      for (int y = 0; y < iHeight; ++y)
+      for (int processedBytes = 0; processedBytes < buffSize; processedBytes += 3, buffer+=4)
       {
-        unsigned char *videoPtr = videoBuffer + y * stride;
+        float alpha = buffer[3] / (float)255;
 
-        for (int x = 0; x < iWidth; ++x, buffer += 4, videoPtr += 3)
+        if (bBlendToBuffer)
         {
-          float alpha = buffer[3] / (float)255;
-
-          if (bBlendToBuffer)
-          {
-            //B
-            buffer[0] = alpha * (float)buffer[0] + (1 - alpha) * (float)videoPtr[0];
-            //G
-            buffer[1] = alpha * (float)buffer[1] + (1 - alpha) * (float)videoPtr[1];
-            //R
-            buffer[2] = alpha * (float)buffer[2] + (1 - alpha) * (float)videoPtr[2];
-            //A
-            buffer[3] = 0xff;// we are solid now
-          }
-          else
-          {
-            memcpy(buffer, videoPtr, 3);
-          }
+          //B
+          buffer[0] = alpha * (float)buffer[0] + (1 - alpha) * (float)videoPtr[0];
+          //G
+          buffer[1] = alpha * (float)buffer[1] + (1 - alpha) * (float)videoPtr[1];
+          //R
+          buffer[2] = alpha * (float)buffer[2] + (1 - alpha) * (float)videoPtr[2];
+          //A
+          buffer[3] = 0xff;// we are solid now
         }
+        else
+        {
+          memcpy(buffer, videoPtr, 3);
+        }
+        videoPtr += 3;
       }
     }
     delete [] videoBuffer;

@@ -22,6 +22,9 @@
 #include "SoLoader.h"
 #include "filesystem/SpecialProtocol.h"
 #include "utils/log.h"
+#if defined(TARGET_ANDROID)
+#include "platform/android/loader/AndroidDyload.h"
+#endif
 
 SoLoader::SoLoader(const std::string &so, bool bGlobal) : LibraryLoader(so)
 {
@@ -51,7 +54,12 @@ bool SoLoader::Load()
   else
   {
     CLog::Log(LOGDEBUG, "Loading: %s\n", strFileName.c_str());
+#if defined(TARGET_ANDROID)
+    CAndroidDyload temp;
+    m_soHandle = temp.Open(strFileName.c_str());
+#else
     m_soHandle = dlopen(strFileName.c_str(), flags);
+#endif
     if (!m_soHandle)
     {
       CLog::Log(LOGERROR, "Unable to load %s, reason: %s", strFileName.c_str(), dlerror());
@@ -67,10 +75,13 @@ void SoLoader::Unload()
 
   if (m_soHandle)
   {
-    CLog::Log(LOGDEBUG, "Unloading: %s\n", GetName());
-    
+#if defined(TARGET_ANDROID)
+    CAndroidDyload temp;
+    if (temp.Close(m_soHandle) != 0)
+#else
     if (dlclose(m_soHandle) != 0)
-       CLog::Log(LOGERROR, "-- Unable to unload. reason: %s", dlerror());
+#endif
+       CLog::Log(LOGERROR, "Unable to unload %s, reason: %s", GetName(), dlerror());
   }
   m_bLoaded = false;
   m_soHandle = NULL;

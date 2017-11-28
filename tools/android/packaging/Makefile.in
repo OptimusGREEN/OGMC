@@ -1,25 +1,19 @@
 include ../../depends/Makefile.include
 
-BUILD_TYPE=@CMAKE_BUILD_TYPE@
-BUILD_TYPE_LC = `echo $(BUILD_TYPE) | tr A-Z a-z`
-
 OBJS = libcurl.so \
   libplist.so libshairplay.so \
   libnfs.so libass.so \
   libbluray.so libsmbclient.so
-SMB_OBJS = libtevent-util.so libdcerpc-binding.so libsamba-errors.so libsamba-util.so libsamba-credentials.so libsamba-hostconfig.so \
-           libwbclient.so libsamdb.so libndr.so libndr-standard.so libndr-nbt.so libndr-krb5pac.so
 
 PLATFORM_OBJS =
 EXCLUDED_ADDONS = 
 
 CORE_SOURCE_DIR = $(shell cd $(CURDIR)/../../..; pwd)
-APP_PACKAGE_DIR = $(subst .,/,@APP_PACKAGE@)
 COPYDIRS = system addons media
 GCC_VERSION=$(shell $(CC) -dumpversion)
 ZIP=zip
 
-SIGN_STORE=~/.android/@APP_NAME@.keystore
+SIGN_STORE=~/.android/debug.keystore
 SIGN_STOREPASS=android
 SIGN_KEY=androiddebugkey
 SIGN_KEYPASS=
@@ -70,7 +64,6 @@ ifeq ($(JAVA8),yes)
 endif
 
 SRCLIBS = $(addprefix $(PREFIX)/lib/,$(OBJS)) $(addprefix $(PREFIX)/lib/$(SDK_PLATFORM)/,$(PLATFORM_OBJS))
-SRCSMBLIBS = $(addprefix $(DEPENDS_PATH)/lib/,$(SMB_OBJS))
 DSTLIBS = $(CPU)/lib/lib@APP_NAME_LC@.so $(addprefix $(CPU)/lib/,$(OBJS)) $(addprefix $(CPU)/lib/,$(PLATFORM_OBJS))
 libs= $(DSTLIBS)
 
@@ -91,16 +84,9 @@ apk-noobb: apk-clean package apk-sign
 xbmc/assets:
 	mkdir -p xbmc/assets
 
-symbols: libs
-ifeq (1,@USE_BREAKPAD@)
-	for f in xbmc/obj/local/$(CPU)/*.so; do sh ./make_symbols.sh $$f; done
-	tar -cjf @APP_NAME_LC@.symbols-$(CPU)-`$(XBMCROOT)/tools/darwin/packaging/gitrev-posix`.tar.bz2 symbols
-endif
-
 shared:
 	mkdir -p assets
 	cp -rfp $(PREFIX)/share/@APP_NAME_LC@/* ./assets
-	cp -rfp $(DEPENDS_PATH)/share/kodi/* ./assets || true
 	find `pwd`/assets/ -depth -name ".git" -exec rm -rf {} \;
 	find `pwd`/assets/ -name "*.so" -exec rm {} \;
 	find `pwd`/assets/addons/skin.*/media/* -depth -not -iname "Textures.xbt" -exec rm -rf {} \;
@@ -113,9 +99,9 @@ sharedapk: shared | xbmc/assets
 	cp -rfp assets/* ./xbmc/assets
 
 sharedobb: shared
-	rm -f $(CORE_SOURCE_DIR)/main.@APP_NAME@.obb
-	$(ZIP) -9 -q -r $(CORE_SOURCE_DIR)/main.@APP_NAME@.obb assets
-	@echo "$(CORE_SOURCE_DIR)/main.@APP_NAME@.obb created"
+	rm -f $(CORE_SOURCE_DIR)/main.@APP_NAME_LC@.obb
+	$(ZIP) -9 -q -r $(CORE_SOURCE_DIR)/main.@APP_NAME_LC@.obb assets
+	@echo "$(CORE_SOURCE_DIR)/main.@APP_NAME_LC@.obb created"
 
 python: | xbmc/assets
 	mkdir -p xbmc/assets/python2.7/lib/
@@ -123,58 +109,57 @@ python: | xbmc/assets
 	cd xbmc/assets/python2.7/lib/python2.7/; rm -rf test config lib-dynload
 
 res:
-	mkdir -p xbmc/res xbmc/res/raw xbmc/res/values
+	mkdir -p xbmc/res xbmc/res/raw xbmc/res/values images
 	@echo "native_arch=$(CPU)" > xbmc/res/raw/xbmc.properties
-	cp -fp $(CORE_SOURCE_DIR)/media/icon36x36.png xbmc/res/drawable/notif_icon.png
-	cp -fp $(CORE_SOURCE_DIR)/media/Splash.png xbmc/res/drawable-nodpi/splash.png
-	cp -fp $(CORE_SOURCE_DIR)/media/banner.png xbmc/res/drawable-xhdpi/banner.png
-	cp -fp $(CORE_SOURCE_DIR)/media/icon36x36.png xbmc/res/drawable-ldpi/ic_launcher.png
-	cp -fp $(CORE_SOURCE_DIR)/media/icon48x48.png xbmc/res/drawable-mdpi/ic_launcher.png
-	cp -fp $(CORE_SOURCE_DIR)/media/icon72x72.png xbmc/res/drawable-hdpi/ic_launcher.png
-	cp -fp $(CORE_SOURCE_DIR)/media/icon96x96.png xbmc/res/drawable-xhdpi/ic_launcher.png
-	cp -fp $(CORE_SOURCE_DIR)/media/icon144x144.png xbmc/res/drawable-xxhdpi/ic_launcher.png
-	cp -fp $(CORE_SOURCE_DIR)/media/icon192x192.png xbmc/res/drawable-xxxhdpi/ic_launcher.png
+	cp -fp $(CORE_SOURCE_DIR)/media/Splash.png xbmc/res/drawable/splash.png
+	cp -fp media/drawable-hdpi/ic_launcher.png xbmc/res/drawable-hdpi/ic_launcher.png
+	cp -fp media/drawable-ldpi/ic_launcher.png xbmc/res/drawable-ldpi/ic_launcher.png
+	cp -fp media/drawable-mdpi/ic_launcher.png xbmc/res/drawable-mdpi/ic_launcher.png
+	cp -fp media/drawable-xhdpi/ic_launcher.png xbmc/res/drawable-xhdpi/ic_launcher.png
+	cp -fp media/drawable-xxhdpi/ic_launcher.png xbmc/res/drawable-xxhdpi/ic_launcher.png
+	cp -fp $(CORE_SOURCE_DIR)/media/Splash.png xbmc/res/drawable-xxxhdpi/splash.png
+	cp -fp media/drawable-xxxhdpi/ic_launcher.png xbmc/res/drawable-xxxhdpi/ic_launcher.png
+	cp -fp media/drawable-xhdpi/banner.png xbmc/res/drawable-xhdpi/banner.png
 	cp xbmc/strings.xml xbmc/res/values/
-	cp xbmc/colors.xml xbmc/res/values/
 	cp xbmc/activity_main.xml xbmc/res/layout/
-	cp xbmc/searchable.xml xbmc/res/xml/
+	mkdir -p tmp/res; $(AAPT) c -S xbmc/res -C tmp/res; cp -r -n xbmc/res tmp/ || true
+	$(AAPT) p -f -I $(SDKROOT)/platforms/$(SDK_PLATFORM)/android.jar -S tmp/res/ -M xbmc/AndroidManifest.xml -F images/@APP_NAME_LC@app-debug-skeleton.apk -J xbmc/src
+	@rm -rf tmp/
 
 libs: $(PREFIX)/lib/@APP_NAME_LC@/lib@APP_NAME_LC@.so
-	rm -rf xbmc/lib/$(CPU) xbmc/obj/local/$(CPU)
-	mkdir -p xbmc/lib/$(CPU) xbmc/assets/python2.7/lib/ xbmc/obj/local/$(CPU)
+	rm -rf xbmc/lib/$(CPU) xbmc/libs/$(CPU) xbmc/obj/local/$(CPU)
+	mkdir -p xbmc/lib/$(CPU) xbmc/assets/python2.7/lib/ xbmc/libs/$(CPU) xbmc/obj/local/$(CPU)
 	cp -fpL $(SRCLIBS) xbmc/obj/local/$(CPU)/
-	cp -fpL $(SRCSMBLIBS) xbmc/obj/local/$(CPU)/ 2>/dev/null || true
 	cp -fp $(PREFIX)/lib/@APP_NAME_LC@/lib@APP_NAME_LC@.so xbmc/obj/local/$(CPU)/
-	find $(PREFIX)/lib/@APP_NAME_LC@/addons -name "*.so" -exec cp -fp {} xbmc/obj/local/$(CPU)/ \; || true
-	find $(PREFIX)/share/@APP_NAME_LC@/addons -name "*.so" -exec cp -fp {} xbmc/obj/local/$(CPU)/ \; || true
-	find $(DEPENDS_PATH)/share/kodi/addons -name "*.so" -exec cp -fp {} xbmc/obj/local/$(CPU)/ \; || true
-	find $(DEPENDS_PATH)/lib/kodi/addons -name "*.so" -exec cp -fp {} xbmc/obj/local/$(CPU)/ \; || true
-	find $(DEPENDS_PATH)/lib/samba -name "*.so" -exec cp -fp {} xbmc/obj/local/$(CPU)/ \; || true
+	find $(PREFIX)/lib/@APP_NAME_LC@/addons -name "*.so" -exec cp -fp {} xbmc/obj/local/$(CPU)/ \;
+	find $(PREFIX)/share/@APP_NAME_LC@/addons -name "*.so" -exec cp -fp {} xbmc/obj/local/$(CPU)/ \;
 	find $(PREFIX)/lib/@APP_NAME_LC@/system -name "*.so" -exec cp -fp {} xbmc/obj/local/$(CPU)/ \;
-	find $(PREFIX)/lib/kodi/addons -name "*.so" -exec cp -fp {} xbmc/obj/local/$(CPU)/ \; || :
-	find $(PREFIX)/share/kodi/addons -name "*.so" -exec cp -fp {} xbmc/obj/local/$(CPU)/ \; || :
 	cd xbmc/obj/local/$(CPU)/; find . -name "*.so" -not -name "lib*.so" | sed "s/\.\///" | xargs -I@ mv @ lib@
 	cp -fp xbmc/obj/local/$(CPU)/*.so xbmc/lib/$(CPU)/
 	$(STRIP) --strip-unneeded xbmc/lib/$(CPU)/*.so
-	install -p $(GDBPATH) ./xbmc/lib/$(CPU)/gdbserver
-	echo "set solib-search-path ./obj/local/$(CPU)" > ./xbmc/lib/$(CPU)/gdb.setup
+	install -p $(GDBPATH) ./xbmc/libs/$(CPU)/gdbserver
+	echo "set solib-search-path ./obj/local/$(CPU)" > ./xbmc/libs/$(CPU)/gdb.setup
 	echo "directory $(TOOLCHAIN)/sysroot/usr/include $(NDKROOT)/sources/android/native_app_glue" \
-             "$(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCC_VERSION)/include $(CORE_SOURCE_DIR)  $(PREFIX)/include jni" >> ./xbmc/lib/$(CPU)/gdb.setup
+	     "$(NDKROOT)/sources/cxx-stl/gnu-libstdc++/$(GCC_VERSION)/include $(CORE_SOURCE_DIR)  $(PREFIX)/include jni" >> ./xbmc/libs/$(CPU)/gdb.setup
+	cp -fp xbmc/libs/$(CPU)/* xbmc/lib/$(CPU)
 
-java: res
-	mkdir -p xbmc/java/$(APP_PACKAGE_DIR) xbmc/java/$(APP_PACKAGE_DIR)/interfaces xbmc/obj
-	@cp xbmc/src/*.java xbmc/java/$(APP_PACKAGE_DIR)/
-	@cp xbmc/src/interfaces/*.java xbmc/java/$(APP_PACKAGE_DIR)/interfaces/
+xbmc/classes.dex: res
+	mkdir -p xbmc/obj
+	@javac -classpath $(SDKROOT)/platforms/$(SDK_PLATFORM)/android.jar:xbmc/obj -d xbmc/obj -sourcepath xbmc/src xbmc/src/*.java $(JAVAC_EXTRA_ARGS)
+	@javac -classpath $(SDKROOT)/platforms/$(SDK_PLATFORM)/android.jar:xbmc/obj -d xbmc/obj -sourcepath xbmc/src xbmc/src/tk/optimusgreen/ogmc/*.java $(JAVAC_EXTRA_ARGS)
+	@$(DX) --dex --output=xbmc/classes.dex xbmc/obj
 
-package: libs python java
-	@echo "Gradle build..."
-	ANDROID_HOME=$(SDKROOT) ./gradlew --no-daemon assemble$(BUILD_TYPE)Unsigned
+package: libs python xbmc/classes.dex
+	@echo "Creating package..."
+	@cp images/@APP_NAME_LC@app-debug-skeleton.apk images/@APP_NAME_LC@app-debug-$(CPU)-unaligned.apk
+	@cd xbmc; $(ZIP) -r -q ../images/@APP_NAME_LC@app-debug-$(CPU)-unaligned.apk lib/$(CPU) assets classes.dex
 
 apk-sign:
 	@echo "Signing..."
-	@jarsigner -sigalg MD5withRSA -digestalg SHA1 -keystore $(SIGN_STORE) -storepass $(SIGN_STOREPASS) $(SIGN_KEYPASS_OPT) xbmc/build/outputs/apk/xbmc-$(BUILD_TYPE_LC)Unsigned-unsigned.apk $(SIGN_KEY)
-	@$(ZIPALIGN) -f 4 xbmc/build/outputs/apk/xbmc-$(BUILD_TYPE_LC)Unsigned-unsigned.apk $(CORE_SOURCE_DIR)/@APP_NAME@app-$(CPU)-$(BUILD_TYPE_LC).apk
-	@echo "$(CORE_SOURCE_DIR)/@APP_NAME@app-$(CPU)-$(BUILD_TYPE_LC).apk created"
+	@jarsigner -sigalg MD5withRSA -digestalg SHA1 -keystore $(SIGN_STORE) -storepass $(SIGN_STOREPASS) $(SIGN_KEYPASS_OPT) images/@APP_NAME_LC@app-debug-$(CPU)-unaligned.apk $(SIGN_KEY)
+	@$(ZIPALIGN) -f 4 images/@APP_NAME_LC@app-debug-$(CPU)-unaligned.apk $(CORE_SOURCE_DIR)/@APP_NAME_LC@app-$(CPU)-debug.apk
+	@rm images/@APP_NAME_LC@app-debug-$(CPU)-unaligned.apk
+	@echo "$(CORE_SOURCE_DIR)/@APP_NAME_LC@app-$(CPU)-debug.apk created"
 
 $(PREFIX)/lib/xbmc/lib@APP_NAME_LC@.so: $(SRCLIBS)
 	$(MAKE) -C ../../depends/target/xbmc
@@ -182,13 +167,17 @@ $(PREFIX)/lib/xbmc/lib@APP_NAME_LC@.so: $(SRCLIBS)
 $(SRCLIBS):
 
 apk-clean:
-	rm -rf xbmc/java
+	rm -rf images
 	rm -rf xbmc/lib
+	rm -rf xbmc/libs
 	rm -rf xbmc/assets
 	rm -rf xbmc/obj
 	rm -rf xbmc/res/raw
 	rm -rf xbmc/res/values
+	rm -rf tmp
 	rm -f xbmc/res/drawable/splash.png
+	rm -f xbmc/src/R.java
+	rm -f xbmc/classes.dex
 	rm -rf assets
 
 .PHONY: force libs assets python sharedapk sharedobb res package

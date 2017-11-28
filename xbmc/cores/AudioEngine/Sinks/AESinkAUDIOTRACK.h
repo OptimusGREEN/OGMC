@@ -27,7 +27,10 @@
 #include <deque>
 #include <set>
 
-#include <androidjni/AudioTrack.h>
+namespace jni
+{
+class CJNIAudioTrack;
+};
 
 class CAESinkAUDIOTRACK : public IAESink
 {
@@ -50,19 +53,14 @@ public:
   static void          EnumerateDevicesEx(AEDeviceInfoList &list, bool force = false);
 
 protected:
-  jni::CJNIAudioTrack *CreateAudioTrack(int stream, int sampleRate, int channelMask, int encoding, int bufferSize);
   static bool IsSupported(int sampleRateInHz, int channelConfig, int audioFormat);
+  static bool VerifySinkConfiguration(int sampleRate, int channelMask, int encoding);
   static bool HasAmlHD();
+  static void UpdateAvailablePCMCapabilities();
+  static void UpdateAvailablePassthroughCapabilities();
   
-  int AudioTrackWrite(char* audioData, int offsetInBytes, int sizeInBytes);
-  int AudioTrackWrite(char* audioData, int sizeInBytes, int64_t timestamp);
-
-  int AEStreamFormatToATFormat(const CAEStreamInfo::DataType& dt);
-
 private:
   jni::CJNIAudioTrack  *m_at_jni;
-  int     m_jniAudioFormat;
-  
   double                m_duration_written;
   unsigned int          m_min_buffer_size;
   int64_t               m_offset;
@@ -79,7 +77,9 @@ private:
   // the newest value gets a weight of 1
   std::deque<double>   m_linearmovingaverage;
 
+  static CAEDeviceInfo m_info;
   static std::set<unsigned int>       m_sink_sampleRates;
+  static bool m_sinkSupportsFloat;
 
   AEAudioFormat      m_format;
   double             m_volume;
@@ -89,9 +89,4 @@ private:
   bool               m_passthrough;
   double             m_audiotrackbuffer_sec;
   int                m_encoding;
-  bool               m_wantsIECPassthrough;
-
-  std::vector<float> m_floatbuf;
-  std::vector<int16_t> m_shortbuf;
-  std::vector<char> m_charbuf;
 };

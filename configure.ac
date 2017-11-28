@@ -120,15 +120,12 @@ AC_DEFUN([XB_PUSH_FLAGS], [
 APP_NAME=${APP_NAME-$(${AWK} '/APP_NAME/ {print $2}' version.txt)}
 APP_NAME_LC=$(echo $APP_NAME | ${AWK} '{print tolower($0)}')
 APP_NAME_UC=$(echo $APP_NAME | ${AWK} '{print toupper($0)}')
-APP_EMAIL=${APP_NAME-$(${AWK} '/EMAIL/ {print $2}' version.txt)}
 APP_VERSION_MAJOR=${APP_VERSION_MAJOR-$(${AWK} '/VERSION_MAJOR/ {print $2}' version.txt)}
 APP_VERSION_MINOR=${APP_VERSION_MINOR-$(${AWK} '/VERSION_MINOR/ {print $2}' version.txt)}
 APP_VERSION_TAG=${APP_VERSION_TAG-$(${AWK} '/VERSION_TAG/ {print $2}' version.txt)}
 APP_VERSION_TAG_LC=$(echo $APP_VERSION_TAG | ${AWK} '{print tolower($0)}')
 APP_VERSION_CODE=${APP_VERSION_CODE-$(${AWK} '/VERSION_CODE/ {print $2}' version.txt)}
 APP_ADDON_API=${APP_ADDON_API-$(${AWK} '/ADDON_API/ {print $2}' version.txt)}
-APP_STICKYURL=${APP_STICKYURL-$(${AWK} '/APP_STICKYURL/ {print $2}' version.txt)}
-APP_EMAIL=${APP_EMAIL-$(${AWK} '/APP_EMAIL/ {print $2}' version.txt)}
 if test "$APP_NAME" != "" && test "$APP_VERSION_MAJOR" != "" && test "$APP_VERSION_MINOR" != "" \
 && test "$APP_VERSION_CODE" != "" && test "$APP_ADDON_API" != ""; then
   APP_VERSION=${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}
@@ -139,7 +136,6 @@ if test "$APP_NAME" != "" && test "$APP_VERSION_MAJOR" != "" && test "$APP_VERSI
   AC_SUBST(APP_NAME)
   AC_SUBST(APP_NAME_LC)
   AC_SUBST(APP_NAME_UC)
-  AC_SUBST(APP_EMAIL)
   AC_SUBST(APP_VERSION)
   AC_SUBST(APP_VERSION_MAJOR)
   AC_SUBST(APP_VERSION_MINOR)
@@ -147,8 +143,6 @@ if test "$APP_NAME" != "" && test "$APP_VERSION_MAJOR" != "" && test "$APP_VERSI
   AC_SUBST(APP_VERSION_TAG_LC)
   AC_SUBST(APP_VERSION_CODE)
   AC_SUBST(APP_ADDON_API)
-  AC_SUBST(APP_STICKYURL)
-  AC_SUBST(APP_EMAIL)
 
   dashes="------------------------"
   final_message="\n  ${APP_NAME} Configuration:"
@@ -508,7 +502,7 @@ PASSED_CXXFLAGS=$CXXFLAGS # Hack to override autoconf default values
 AC_PROG_CXX
 AX_PROG_CXX_FOR_BUILD
 CXXFLAGS="$PASSED_CXXFLAGS $DEFAULT_COMPILE_FLAGS"
-AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
+AX_CXX_COMPILE_STDCXX_11(,[optional])
 AC_PROG_LIBTOOL
 AC_PROG_AWK
 AC_PROG_LN_S
@@ -2216,6 +2210,7 @@ OUTPUT_FILES="Makefile \
     xbmc/platform/posix/Makefile \
     xbmc/platform/darwin/osx/Makefile \
     xbmc/platform/android/activity/Makefile \
+    xbmc/platform/android/loader/Makefile \
     xbmc/platform/android/jni/Makefile \
     xbmc/utils/Makefile \
     xbmc/platform/Makefile \
@@ -2229,23 +2224,14 @@ OUTPUT_FILES="Makefile \
     project/cmake/KodiConfig.cmake \
     tools/android/packaging/xbmc/AndroidManifest.xml \
     tools/android/packaging/Makefile \
-    tools/android/packaging/xbmc/src/Splash.java \
-    tools/android/packaging/xbmc/src/Main.java \
-    tools/android/packaging/xbmc/src/XBMCBroadcastReceiver.java \
-    tools/android/packaging/xbmc/src/XBMCInputDeviceListener.java \
-    tools/android/packaging/xbmc/src/XBMCOnFrameAvailableListener.java \
-    tools/android/packaging/xbmc/src/XBMCSettingsContentObserver.java \
-    tools/android/packaging/xbmc/src/XBMCOnAudioFocusChangeListener.java \
-    tools/android/packaging/xbmc/src/XBMCVideoView.java \
-    tools/android/packaging/xbmc/src/XBMCImageContentProvider.java \
-    tools/android/packaging/xbmc/src/XBMCMediaContentProvider.java \
-    tools/android/packaging/xbmc/src/XBMCRecommendationBuilder.java \
-    tools/android/packaging/xbmc/src/XBMCJsonRPC.java \
-    tools/android/packaging/xbmc/src/XBMCSearchableActivity.java \
-    tools/android/packaging/xbmc/src/XBMCProperties.java \
-    tools/android/packaging/xbmc/src/XBMCCrashHandler.java \
-    tools/android/packaging/xbmc/src/XBMCProjection.java \
-    tools/android/packaging/xbmc/src/XBMCMediaSession.java \
+    tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/Splash.java \
+    tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/Main.java \
+    tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCBroadcastReceiver.java \
+    tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCInputDeviceListener.java \
+    tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCOnFrameAvailableListener.java \
+    tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCSettingsContentObserver.java \
+    tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCOnAudioFocusChangeListener.java \
+    tools/android/packaging/xbmc/src/tk/optimusgreen/ogmc/XBMCVideoView.java \
     tools/android/packaging/xbmc/activity_main.xml \
     tools/android/packaging/xbmc/strings.xml \
     addons/xbmc.addon/addon.xml"

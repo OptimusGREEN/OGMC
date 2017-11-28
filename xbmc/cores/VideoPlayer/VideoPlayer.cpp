@@ -163,6 +163,9 @@ public:
 
   bool operator()(const SelectionStream& ss) const
   {
+    if (ss.type_index == CMediaSettings::GetInstance().GetCurrentVideoSettings().m_SubtitleStream)
+      return false;
+
     if (nosub)
       return true;
 
@@ -174,10 +177,7 @@ public:
         return true;
     }
 
-    if (ss.type_index == CMediaSettings::GetInstance().GetCurrentVideoSettings().m_SubtitleStream)
-      return false;
-
-    if (STREAM_SOURCE_MASK(ss.source) == STREAM_SOURCE_DEMUX_SUB || STREAM_SOURCE_MASK(ss.source) == STREAM_SOURCE_TEXT)
+    if(STREAM_SOURCE_MASK(ss.source) == STREAM_SOURCE_DEMUX_SUB || STREAM_SOURCE_MASK(ss.source) == STREAM_SOURCE_TEXT)
       return false;
 
     if ((ss.flags & CDemuxStream::FLAG_FORCED) && g_LangCodeExpander.CompareISO639Codes(ss.language, audiolang))
@@ -918,8 +918,7 @@ void CVideoPlayer::OpenDefaultStreams(bool reset)
 
   // open video stream
   valid   = false;
-
-  CloseStream(m_CurrentVideo, false);
+  
   for (const auto &stream : m_SelectionStreams.Get(STREAM_VIDEO, PredicateVideoPriority))
   {
     if(OpenStream(m_CurrentVideo, stream.demuxerId, stream.id, stream.source, reset))
@@ -936,8 +935,8 @@ void CVideoPlayer::OpenDefaultStreams(bool reset)
 
   // open audio stream
   valid   = false;
+  if(!m_PlayerOptions.video_only)
   {
-    CloseStream(m_CurrentAudio, false);
     for (const auto &stream : m_SelectionStreams.Get(STREAM_AUDIO, PredicateAudioPriority))
     {
       if(OpenStream(m_CurrentAudio, stream.demuxerId, stream.id, stream.source, reset))
@@ -968,7 +967,7 @@ void CVideoPlayer::OpenDefaultStreams(bool reset)
     {
       valid = true;
       if(!psp.relevant(stream))
-        valid = false;
+        visible = false;
       else if(stream.flags & CDemuxStream::FLAG_FORCED)
         visible = true;
       break;
@@ -982,7 +981,6 @@ void CVideoPlayer::OpenDefaultStreams(bool reset)
 
   // open teletext stream
   valid   = false;
-  CloseStream(m_CurrentTeletext, false);
   for (const auto &stream : m_SelectionStreams.Get(STREAM_TELETEXT))
   {
     if(OpenStream(m_CurrentTeletext, stream.demuxerId, stream.id, stream.source))
@@ -996,7 +994,6 @@ void CVideoPlayer::OpenDefaultStreams(bool reset)
 
   // open RDS stream
   valid   = false;
-  CloseStream(m_CurrentRadioRDS, false);
   for (const auto &stream : m_SelectionStreams.Get(STREAM_RADIO_RDS))
   {
     if(OpenStream(m_CurrentRadioRDS, stream.demuxerId, stream.id, stream.source))
@@ -1224,6 +1221,8 @@ void CVideoPlayer::CheckBetterStream(CCurrentStream& current, CDemuxStream* stre
 
 void CVideoPlayer::Process()
 {
+  CFFmpegLog::SetLogLevel(1);
+
   if (!OpenInputStream())
   {
     m_bAbortRequest = true;
@@ -2480,6 +2479,8 @@ void CVideoPlayer::OnExit()
 
   // set event to inform openfile something went wrong in case openfile is still waiting for this event
   m_ready.Set();
+
+  CFFmpegLog::ClearLogLevel();
 }
 
 void CVideoPlayer::HandleMessages()
@@ -3552,7 +3553,7 @@ void CVideoPlayer::SetSpeed(float speed)
 
   if (!CanSeek())
     return;
-
+  
   m_newPlaySpeed = speed * DVD_PLAYSPEED_NORMAL;
   if (m_newPlaySpeed != m_playSpeed)
   {
@@ -3612,7 +3613,7 @@ bool CVideoPlayer::OpenStream(CCurrentStream& current, int64_t demuxerId, int iS
     stream = m_pSubtitleDemuxer->GetStream(demuxerId, iStream);
     if(!stream || stream->disabled)
       return false;
-
+    
     m_pSubtitleDemuxer->EnableStream(demuxerId, iStream, true);
 
     hint.Assign(*stream, true);
@@ -4447,12 +4448,12 @@ bool CVideoPlayer::OnAction(const CAction &action)
       case ACTION_NEXT_ITEM:
       case ACTION_CHANNEL_UP:
       {
-        if (m_Edl.HasCut())
+        if (m_Edl.HasCut()) 
         {
           // If the clip has an EDL, we'll search through that instead of sending a CHANNEL message
           const int64_t clock = m_omxplayer_mode ? GetTime() : DVD_TIME_TO_MSEC(std::min(m_CurrentAudio.dts, m_CurrentVideo.dts) + m_offset_pts);
           CEdl::Cut cut;
-          if (m_Edl.GetNearestCut(true, clock, &cut))
+          if (m_Edl.GetNearestCut(true, clock, &cut)) 
           {
             CDVDMsgPlayerSeek::CMode mode;
             mode.time = cut.end + 1;
@@ -4496,7 +4497,7 @@ bool CVideoPlayer::OnAction(const CAction &action)
           // If the clip has an EDL, we'll search through that instead of sending a CHANNEL message
           const int64_t clock = m_omxplayer_mode ? GetTime() : DVD_TIME_TO_MSEC(std::min(m_CurrentAudio.dts, m_CurrentVideo.dts) + m_offset_pts);
           CEdl::Cut cut;
-          if (m_Edl.GetNearestCut(false, clock, &cut))
+          if (m_Edl.GetNearestCut(false, clock, &cut)) 
           {
             CDVDMsgPlayerSeek::CMode mode;
             mode.time = cut.start - 1;
@@ -5057,11 +5058,11 @@ bool CVideoPlayer::GetStreamDetails(CStreamDetails &details)
       p.m_strLanguage = subs[i].language;
       extSubDetails.push_back(p);
     }
-
+    
     bool result = CDVDFileInfo::DemuxerToStreamDetails(m_pInputStream, m_pDemuxer, extSubDetails, details);
     if (result && details.GetStreamCount(CStreamDetail::VIDEO) > 0) // this is more correct (dvds in particular)
     {
-      /*
+      /* 
        * We can only obtain the aspect & duration from VideoPlayer when the Process() thread is running
        * and UpdatePlayState() has been called at least once. In this case VideoPlayer duration/AR will
        * return 0 and we'll have to fallback to the (less accurate) info from the demuxer.
@@ -5205,10 +5206,8 @@ void CVideoPlayer::VideoParamsChange()
   m_messenger.Put(new CDVDMsg(CDVDMsg::PLAYER_AVCHANGE));
 }
 
-void CVideoPlayer::GetDebugInfo(std::string &acodec, std::string &audio, std::string &vcodec, std::string &video, std::string &general)
+void CVideoPlayer::GetDebugInfo(std::string &audio, std::string &video, std::string &general)
 {
-  acodec = m_VideoPlayerAudio->GetCodecInfo();
-  vcodec = m_VideoPlayerVideo->GetCodecInfo();
   audio = m_VideoPlayerAudio->GetPlayerInfo();
   video = m_VideoPlayerVideo->GetPlayerInfo();
   GetGeneralInfo(general);

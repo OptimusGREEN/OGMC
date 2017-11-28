@@ -20,9 +20,7 @@
 
 #include "GUIDialogAccessPoints.h"
 #include "guilib/GUIKeyboardFactory.h"
-#if defined(TARGET_ANDROID)
-#include "android/NetworkAndroid.h"
-#elif defined(TARGET_POSIX)
+#ifdef TARGET_POSIX
 #include "linux/NetworkLinux.h"
 #endif
 #include "Application.h"

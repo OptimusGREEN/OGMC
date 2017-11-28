@@ -18,7 +18,6 @@
  *
  */
 
-#include <algorithm>
 #include <string>
 #include <sstream>
 
@@ -103,10 +102,7 @@ bool CWebSocketV13::Handshake(const char* data, size_t length, std::string &resp
 
   // There must be a "Connection" header with the value "Upgrade"
   value = header.getValue(WS_HEADER_CONNECTION_LC);
-  std::vector<std::string> elements;
-  if (value != nullptr)
-    elements = StringUtils::Split(value, ",");
-  if (elements.empty() || !std::any_of(elements.begin(), elements.end(), [](std::string& elem) { return StringUtils::EqualsNoCase(StringUtils::Trim(elem), WS_HEADER_UPGRADE); }))
+  if (value == NULL || strnicmp(value, WS_HEADER_UPGRADE, strlen(WS_HEADER_UPGRADE)) != 0)
   {
     CLog::Log(LOGINFO, "WebSocket [RFC6455]: invalid \"%s\" received", WS_HEADER_CONNECTION_LC);
     return true;

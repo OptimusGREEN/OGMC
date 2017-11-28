@@ -626,7 +626,6 @@ bool CGUIWindowVideoBase::OnSelect(int iItem)
 
 bool CGUIWindowVideoBase::OnFileAction(int iItem, int action, std::string player)
 {
-  if (iItem < 0 || iItem >= m_vecItems->Size()) return true;
   CFileItemPtr item = m_vecItems->Get(iItem);
 
   // Reset the current start offset. The actual resume

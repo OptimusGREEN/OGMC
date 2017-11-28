@@ -82,7 +82,6 @@ public:
   virtual bool Restore() { return false; }
   virtual bool Hide() { return false; }
   virtual bool Show(bool raise = true) { return false; }
-  virtual bool BringToFront() { return false; }
 
   // notifications
   virtual void OnMove(int x, int y) {}

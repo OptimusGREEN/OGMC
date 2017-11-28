@@ -33,8 +33,7 @@ public:
   virtual void Run(std::atomic<bool>& stop);
   virtual void Cleanup();
   virtual float GetFps();
-  virtual void RefreshChanged();
-
+  
   // IDispResource interface
   virtual void OnResetDisplay();
 

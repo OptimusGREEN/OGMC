@@ -49,7 +49,7 @@ bool CAndroidAppDirectory::GetDirectory(const CURL& url, CFileItemList &items)
   CLog::Log(LOGDEBUG, "CAndroidAppDirectory::GetDirectory: %s",dirname.c_str()); 
   std::string appName = CCompileInfo::GetAppName();
   StringUtils::ToLower(appName);
-  std::string className = CCompileInfo::GetPackage();
+  std::string className = "tk.optimusgreen." + appName;
 
   if (dirname == "apps")
   {
@@ -65,16 +65,10 @@ bool CAndroidAppDirectory::GetDirectory(const CURL& url, CFileItemList &items)
         continue;
       CFileItemPtr pItem(new CFileItem((*i).packageName));
       pItem->m_bIsFolder = false;
-
-      CURL appUrl;
-      appUrl.SetProtocol("androidapp");
-      appUrl.SetHostName(url.GetHostName());
-      appUrl.SetFileName(dirname + "/" + (*i).packageName);
-      appUrl.SetOption("class", (*i).className);
-
-      pItem->SetPath(appUrl.Get());
+      std::string path = StringUtils::Format("androidapp://%s/%s/%s", url.GetHostName().c_str(), dirname.c_str(), (*i).packageName.c_str());
+      pItem->SetPath(path);
       pItem->SetLabel((*i).packageLabel);
-      pItem->SetArt("thumb", appUrl.GetWithoutOptions() + ".png");
+      pItem->SetArt("thumb", path+".png");
       pItem->m_dwSize = -1;  // No size
       items.Add(pItem);
     }

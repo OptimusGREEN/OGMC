@@ -40,9 +40,6 @@ public:
   // Feature support
   virtual bool Supports(EINTERLACEMETHOD method); 
 
-  // Renderers
-  void RenderToFBO(int index, int field, bool weave = false);
-
   virtual EINTERLACEMETHOD AutoInterlaceMethod();
   virtual CRenderInfo GetRenderInfo();
 

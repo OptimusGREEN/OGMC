@@ -55,8 +55,6 @@ public:
   virtual bool  GetPreferredResolution(RESOLUTION_INFO *res) const;
 
   virtual bool  ShowWindow(bool show);
-  virtual bool  BringToFront() { return false; }
-
 #if defined(TARGET_RASPBERRY_PI)
 private:
   DllBcmHost                    *m_DllBcmHost;

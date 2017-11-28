@@ -1,6 +1,6 @@
 include ../../Makefile.include
 DEPS= ../../Makefile.include Makefile Python-2.7.12-crosscompile.patch Python-2.7.10-android.patch Python-no-export-path.patch \
-       Python-setup.patch fix-datetime.patch Python-2.6.5-urllib.diff modules.setup make-fork-optional.patch android-binmodule.patch
+       Python-setup.patch fix-datetime.patch Python-2.6.5-urllib.diff modules.setup make-fork-optional.patch
 
 # lib name, version
 LIBNAME=Python
@@ -39,16 +39,10 @@ $(PLATFORM): $(TARBALLS_LOCATION)/$(ARCHIVE) $(DEPS)
 	cd $(PLATFORM); patch -p0 < ../Python-2.7.10-android.patch
 	cd $(PLATFORM); patch -p0 < ../Python-no-export-path.patch
 	cd $(PLATFORM); patch -p0 < ../fix-ffi.patch
-	cd $(PLATFORM); patch -l -p0 < ../python-android-binmodule.patch
-	cd $(PLATFORM); patch -p1 < ../Python-no-abort.patch
-	cd $(PLATFORM); patch -p1 < ../python-android-nl_langinfo.patch
 ifeq ($(OS),ios)
 	cd $(PLATFORM); patch -p0 < ../make-fork-optional.patch
 	cd $(PLATFORM); patch -p0 < ../Python-2.6.5-urllib.diff
 	cd $(PLATFORM); sed -ie 's|MACHDEP="unknown"|MACHDEP="darwin"|' configure.ac
-endif
-ifeq ($(OS),android)
-	cd $(PLATFORM); patch -p1 < ../Python-2.7.12-nolfs.patch
 endif
 	cp modules.setup $(PLATFORM)/Modules/Setup.dist
 

@@ -92,7 +92,6 @@
 #include "addons/AddonManager.h"
 #include "addons/BinaryAddonCache.h"
 #include "interfaces/info/InfoBool.h"
-#include "interfaces/AnnouncementManager.h"
 #include "video/VideoThumbLoader.h"
 #include "music/MusicThumbLoader.h"
 #include "video/VideoDatabase.h"
@@ -129,8 +128,6 @@ public:
   bool DoWork(void)
   {
     g_infoManager.SetCurrentItemJob(m_itemCurrentFile);
-    g_application.m_ServiceManager->GetAnnouncementManager().Announce(ANNOUNCEMENT::Info, "xbmc", "OnChanged");
-
     return true;
   }
 };

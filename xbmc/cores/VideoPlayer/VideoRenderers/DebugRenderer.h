@@ -23,8 +23,6 @@
 #include "OverlayRenderer.h"
 #include <string>
 
-#define OVERLAY_LINES 6
-
 class CDVDOverlayText;
 
 class CDebugRenderer
@@ -32,7 +30,7 @@ class CDebugRenderer
 public:
   CDebugRenderer();
   virtual ~CDebugRenderer();
-  void SetInfo(std::string &info1, std::string &info2, std::string &info3, std::string &info4, std::string &info5, std::string &info6);
+  void SetInfo(std::string &info1, std::string &info2, std::string &info3, std::string &info4);
   void Render(CRect &src, CRect &dst, CRect &view);
   void Flush();
 
@@ -45,7 +43,7 @@ protected:
     void Render(int idx) override;
   };
 
-  std::string m_strDebug[OVERLAY_LINES];
-  CDVDOverlayText *m_overlay[OVERLAY_LINES];
+  std::string m_strDebug[4];
+  CDVDOverlayText *m_overlay[4];
   CRenderer m_overlayRenderer;
 };

@@ -28,7 +28,6 @@
 #include "settings/lib/ISettingCallback.h"
 #include "settings/lib/ISettingsHandler.h"
 #include "utils/GlobalsHandling.h"
-#include "utils/JobManager.h"
 
 #define CACHE_BUFFER_MODE_INTERNET      0
 #define CACHE_BUFFER_MODE_ALL           1
@@ -112,7 +111,7 @@ struct RefreshVideoLatency
 
 typedef std::vector<TVShowRegexp> SETTINGS_TVSHOWLIST;
 
-class CAdvancedSettings : public ISettingCallback, public ISettingsHandler, CJobQueue
+class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
 {
   public:
     CAdvancedSettings();
@@ -163,8 +162,6 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler, CJob
     std::string m_videoPPFFmpegPostProc;
     bool m_videoVDPAUtelecine;
     bool m_videoVDPAUdeintSkipChromaHD;
-    bool m_videoUseDroidProjectionCapture;
-
     bool m_musicUseTimeSeeking;
     int m_musicTimeSeekForward;
     int m_musicTimeSeekBackward;
@@ -279,11 +276,6 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler, CJob
 
     std::set<std::string> m_vecTokens;
 
-    std::string m_recentlyAddedMusicPath;
-    std::string m_recentlyAddedMoviePath;
-    std::string m_recentlyAddedEpisodePath;
-    std::string m_recentlyAddedMusicVideoPath;
-
     int m_iEpgLingerTime;           // minutes
     int m_iEpgUpdateCheckInterval;  // seconds
     int m_iEpgCleanupInterval;      // seconds
@@ -357,7 +349,6 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler, CJob
     unsigned int m_jsonTcpPort;
 
     bool m_enableMultimediaKeys;
-    bool m_disableminimize;
     std::vector<std::string> m_settingsFiles;
     void ParseSettingsFile(const std::string &file);
 
@@ -391,7 +382,6 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler, CJob
 
     std::string m_userAgent;
 
-    void setInternalMYSQL(const bool enable, const bool init);
   private:
     std::string m_musicExtensions;
     void setExtraLogLevel(const std::vector<CVariant> &components);

@@ -115,19 +115,16 @@ void CSMB::Init()
       {
         fprintf(f, "[global]\n");
 
-        fprintf(f, "\tcache directory = %s/.smb/\n", home.c_str());
         fprintf(f, "\tlock directory = %s/.smb/\n", home.c_str());
 
         // set maximum smbclient protocol version
-        if (CSettings::GetInstance().GetInt(CSettings::SETTING_SMB_MAXPROTOCOL) == 1)
+        if (CSettings::GetInstance().GetInt(CSettings::SETTING_SMB_MAXPROTOCOL) > 0)
         {
-          fprintf(f, "\tclient max protocol = NT1\n");
-          // use the weaker LANMAN password hash in order to be compatible with older servers
-          fprintf(f, "\tclient lanman auth = yes\n");
-          fprintf(f, "\tlanman auth = yes\n");
+          if (CSettings::GetInstance().GetInt(CSettings::SETTING_SMB_MAXPROTOCOL) == 1)
+            fprintf(f, "\tclient max protocol = NT1\n");
+          else
+            fprintf(f, "\tclient max protocol = SMB%d\n", CSettings::GetInstance().GetInt(CSettings::SETTING_SMB_MAXPROTOCOL));
         }
-        else
-          fprintf(f, "\tclient max protocol = SMB%d\n", CSettings::GetInstance().GetInt(CSettings::SETTING_SMB_MAXPROTOCOL));
 
         // set wins server if there's one. name resolve order defaults to 'lmhosts host wins bcast'.
         // if no WINS server has been specified the wins method will be ignored.
@@ -672,4 +669,3 @@ int CSMBFile::IoControl(EIoControl request, void* param)
 
   return -1;
 }
-

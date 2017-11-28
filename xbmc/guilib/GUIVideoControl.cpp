@@ -37,7 +37,8 @@ CGUIVideoControl::~CGUIVideoControl(void)
 void CGUIVideoControl::Process(unsigned int currentTime, CDirtyRegionList &dirtyregions)
 {
   //! @todo Proper processing which marks when its actually changed. Just mark always for now.
-  MarkDirtyRegion();
+  if (g_application.m_pPlayer->IsRenderingGuiLayer())
+    MarkDirtyRegion();
 
   CGUIControl::Process(currentTime, dirtyregions);
 }
@@ -54,17 +55,21 @@ void CGUIVideoControl::Render()
     g_graphicsContext.SetTransform(mat, 1.0, 1.0);
 
     color_t alpha = g_graphicsContext.MergeAlpha(0xFF000000) >> 24;
-    CRect old = g_graphicsContext.GetScissors();
-    CRect region = GetRenderRegion();
-    region.Intersect(old);
-    g_graphicsContext.SetScissors(region);
+    if (g_application.m_pPlayer->IsRenderingVideoLayer())
+    {
+      CRect old = g_graphicsContext.GetScissors();
+      CRect region = GetRenderRegion();
+      region.Intersect(old);
+      g_graphicsContext.SetScissors(region);
 #ifdef HAS_IMXVPU
-    g_graphicsContext.Clear((16 << 16)|(8 << 8)|16);
+      g_graphicsContext.Clear((16 << 16)|(8 << 8)|16);
 #else
-    g_graphicsContext.Clear(0);
+      g_graphicsContext.Clear(0);
 #endif
-    g_graphicsContext.SetScissors(old);
-    g_application.m_pPlayer->Render(false, alpha);
+      g_graphicsContext.SetScissors(old);
+    }
+    else
+      g_application.m_pPlayer->Render(false, alpha);
 
     g_graphicsContext.RemoveTransform();
   }

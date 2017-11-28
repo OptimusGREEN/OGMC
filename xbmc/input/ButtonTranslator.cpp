@@ -76,7 +76,6 @@ static const ActionMapping actions[] =
     { "skipnext"                 , ACTION_NEXT_ITEM },
     { "skipprevious"             , ACTION_PREV_ITEM },
     { "fullscreen"               , ACTION_SHOW_GUI },
-    { "pictureinpicture"         , ACTION_PICTUREINPICTURE },
     { "aspectratio"              , ACTION_ASPECT_RATIO },
     { "stepforward"              , ACTION_STEP_FORWARD },
     { "stepback"                 , ACTION_STEP_BACK },
@@ -89,7 +88,7 @@ static const ActionMapping actions[] =
     { "nextsubtitle"             , ACTION_NEXT_SUBTITLE },
     { "cyclesubtitle"            , ACTION_CYCLE_SUBTITLE },
     { "playerdebug"              , ACTION_PLAYER_DEBUG },
-    { "codecinfo"                , ACTION_PLAYER_DEBUG },
+    { "codecinfo"                , ACTION_PLAYER_PROCESS_INFO },
     { "playerprocessinfo"        , ACTION_PLAYER_PROCESS_INFO },
     { "nextpicture"              , ACTION_NEXT_PICTURE },
     { "previouspicture"          , ACTION_PREV_PICTURE },
@@ -263,9 +262,6 @@ static const ActionMapping actions[] =
     { "swiperight"               , ACTION_GESTURE_SWIPE_RIGHT },
     { "swipeup"                  , ACTION_GESTURE_SWIPE_UP },
     { "swipedown"                , ACTION_GESTURE_SWIPE_DOWN },
-
-    // Voice
-    { "voicerecognizer"          , ACTION_VOICE_RECOGNIZE },
 
     // Do nothing / error action
     { "error"                    , ACTION_ERROR },

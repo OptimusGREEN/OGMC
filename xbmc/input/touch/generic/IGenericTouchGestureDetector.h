@@ -19,10 +19,10 @@
  *
  */
 
-#include <array>
-
 #include "input/touch/ITouchInputHandling.h"
 #include "input/touch/TouchTypes.h"
+
+#define TOUCH_MAX_POINTERS  2
 
 /*!
  * \ingroup touch_generic
@@ -37,8 +37,7 @@ public:
   {
     RegisterHandler(handler);
   }
-  ~IGenericTouchGestureDetector() override = default;
-  static constexpr int MAX_POINTERS = 2;
+  virtual ~IGenericTouchGestureDetector() { }
 
   /*!
    * \brief Check whether the gesture recognition is finished or not
@@ -100,5 +99,5 @@ protected:
   /*!
    * \brief Local list of all known touch pointers
    */
-  std::array<Pointer, MAX_POINTERS> m_pointers;
+  Pointer m_pointers[TOUCH_MAX_POINTERS];
 };

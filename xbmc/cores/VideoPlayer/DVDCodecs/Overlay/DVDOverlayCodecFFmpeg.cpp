@@ -244,12 +244,17 @@ CDVDOverlay* CDVDOverlayCodecFFmpeg::GetOverlay()
     }
 
     RENDER_STEREO_MODE render_stereo_mode = g_graphicsContext.GetStereoMode();
-    if (render_stereo_mode == RENDER_STEREO_MODE_SPLIT_HORIZONTAL)
+    if (render_stereo_mode != RENDER_STEREO_MODE_OFF)
     {
       if (rect.h > m_height / 2)
       {
         m_height /= 2;
         rect.h /= 2;
+      }
+      else if (rect.w > m_width / 2)
+      {
+        m_width /= 2;
+        rect.w /= 2;
       }
     }
 

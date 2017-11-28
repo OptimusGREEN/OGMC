@@ -20,10 +20,7 @@
  *
  */
 
-#include <deque>
-
 #include "guilib/Geometry.h"
-#include "utils/Vector.h"
 
 class CApplication;
 class CAction;
@@ -43,18 +40,8 @@ class CInertialScrollingHandler
     //-------------------------------------------vars for inertial scrolling animation with gestures
     bool          m_bScrolling;        //flag indicating that we currently do the inertial scrolling emulation
     bool          m_bAborting;         //flag indicating an abort of scrolling
-    CVector       m_iFlickVelocity;
-
-    struct PanPoint
-    {
-      unsigned int time;
-      CVector velocity;
-      PanPoint(unsigned int time, CVector velocity)
-        : time(time), velocity(velocity) {}
-      unsigned int TimeElapsed() const;
-    };
-    std::deque<PanPoint> m_panPoints;
+    CPoint        m_iFlickVelocity;
     CPoint        m_iLastGesturePoint;
-    CVector       m_inertialDeacceleration;
+    CPoint        m_inertialDeacceleration;
     unsigned int  m_inertialStartTime;  
 };

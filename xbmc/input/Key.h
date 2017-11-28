@@ -181,7 +181,7 @@
 #define ACTION_SHOW_PLAYLIST          33 //!< used to toggle between current view and playlist view. Can b used in all mymusic xml files
 #define ACTION_QUEUE_ITEM             34 //!< used to queue a item to the playlist. Can b used in all mymusic xml files
 #define ACTION_REMOVE_ITEM            35 //!< not used anymore
-#define ACTION_PICTUREINPICTURE       36 //!< Android only: Switch to PIP on API >= 24
+#define ACTION_SHOW_FULLSCREEN        36 //!< not used anymore
 #define ACTION_ZOOM_LEVEL_NORMAL      37 //!< zoom 1x picture during slideshow. Can b used in slideshow.xml window id=2007
 #define ACTION_ZOOM_LEVEL_1           38 //!< zoom 2x picture during slideshow. Can b used in slideshow.xml window id=2007
 #define ACTION_ZOOM_LEVEL_2           39 //!< zoom 3x picture during slideshow. Can b used in slideshow.xml window id=2007
@@ -329,7 +329,6 @@
 #define ACTION_MENU                   163
 
 #define ACTION_SET_RATING             164
-#define ACTION_SET_RATING_VALUE       165
 
 #define ACTION_RECORD                 170
 
@@ -389,9 +388,6 @@
 #define ACTION_VOLUME_SET             245
 #define ACTION_TOGGLE_COMMSKIP        246
 
-// Voice actions
-#define ACTION_VOICE_RECOGNIZE        300
-
 #define ACTION_TOUCH_TAP              401 //!< touch actions
 #define ACTION_TOUCH_TAP_TEN          410 //!< touch actions
 #define ACTION_TOUCH_LONGPRESS        411 //!< touch actions
@@ -402,7 +398,6 @@
 #define ACTION_GESTURE_ZOOM           502 //!< sendaction with point and currentPinchScale (fingers together < 1.0 -> fingers apart > 1.0)
 #define ACTION_GESTURE_ROTATE         503
 #define ACTION_GESTURE_PAN            504
-#define ACTION_GESTURE_ABORT          505 //!< gesture was interrupted in unspecified state
 
 #define ACTION_GESTURE_SWIPE_LEFT       511
 #define ACTION_GESTURE_SWIPE_LEFT_TEN   520
@@ -448,7 +443,7 @@ class CAction
 public:
   CAction(int actionID, float amount1 = 1.0f, float amount2 = 0.0f, const std::string &name = "", unsigned int holdTime = 0);
   CAction(int actionID, wchar_t unicode);
-  CAction(int actionID, unsigned int state, float posX, float posY, float offsetX, float offsetY, float velocityX = 0.0f, float velocityY = 0.0f, const std::string &name = "");
+  CAction(int actionID, unsigned int state, float posX, float posY, float offsetX, float offsetY, const std::string &name = "");
   CAction(int actionID, const std::string &name, const CKey &key);
   CAction(int actionID, const std::string &name);
 
@@ -514,7 +509,7 @@ private:
   int          m_id;
   std::string   m_name;
 
-  static const unsigned int max_amounts = 6; // Must be at least 6.
+  static const unsigned int max_amounts = 4; // Must be at least 4.
   float        m_amount[max_amounts];
 
   float        m_repeat;

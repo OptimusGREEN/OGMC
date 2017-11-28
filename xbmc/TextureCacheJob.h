@@ -141,15 +141,3 @@ public:
 private:
   std::vector<CTextureDetails> m_textures;
 };
-
-/* \brief Job class for storing the use count of textures
- */
-class CTextureCleanupJob : public CJob
-{
-public:
-  CTextureCleanupJob();
-
-  virtual const char* GetType() const { return "cleanup"; };
-  virtual bool operator==(const CJob *job) const;
-  virtual bool DoWork();
-};

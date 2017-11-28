@@ -30,10 +30,6 @@
 #include "platform/win32/IMMNotificationClient.h"
 #endif
 
-#if defined(TARGET_ANDROID)
-#include "platform/android/activity/XBMCApp.h"
-#endif
-
 #include "platform/MessagePrinter.h"
 
 
@@ -63,8 +59,6 @@ extern "C" int XBMC_Run(bool renderGUI, CFileItemList &playlist)
   if(!g_RBP.Initialize())
     return false;
   g_RBP.LogFirmwareVerison();
-#elif defined(TARGET_ANDROID)
-  CXBMCApp::get()->Initialize();
 #endif
 
   if (renderGUI && !g_application.CreateGUI())
@@ -88,11 +82,6 @@ extern "C" int XBMC_Run(bool renderGUI, CFileItemList &playlist)
     pEnumerator->RegisterEndpointNotificationCallback(&cMMNC);
     SAFE_RELEASE(pEnumerator);
   }
-#endif
-
-#if defined(TARGET_ANDROID)
-  if (g_advancedSettings.m_videoUseDroidProjectionCapture)
-    CXBMCApp::startProjection();
 #endif
 
   try
@@ -126,8 +115,6 @@ extern "C" int XBMC_Run(bool renderGUI, CFileItemList &playlist)
 
 #ifdef TARGET_RASPBERRY_PI
   g_RBP.Deinitialize();
-#elif defined(TARGET_ANDROID)
-  CXBMCApp::get()->Deinitialize();
 #endif
 
   return status;

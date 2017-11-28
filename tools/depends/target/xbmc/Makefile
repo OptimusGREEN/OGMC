@@ -1,7 +1,7 @@
 -include ../../Makefile.include
 
 VERSION.TXT := $(CORE_SOURCE_DIR)/version.txt
-APP_NAME=$(shell awk '/APP_NAME/ {print $$2}' $(VERSION.TXT))
+APP_NAME=$(shell awk '/APP_NAME/ {print tolower($$2)}' $(VERSION.TXT))
 
 SOURCE=../../../../
 
@@ -17,7 +17,6 @@ CONFIGURE += --disable-libcec
 endif
 
 ifeq ($(Configuration),Release)
-CONFIGURE += --enable-breakpad
 DEBUG = --enable-debug=no
 endif
 
@@ -25,11 +24,10 @@ CONFIGURE += $(CONFIG_EXTRA)
 
 all: $(SOURCE)/lib$(APP_NAME).so
 
-release: DEBUG = --enable-debug=no
-release: CONFIGURE += --enable-breakpad
+release: DEBUG=--enable-debug=no
 release: $(SOURCE)/lib$(APP_NAME).so
 
-debug: DEBUG = --enable-debug=yes
+debug: DEBUG=--enable-debug=yes
 debug: $(SOURCE)/lib$(APP_NAME).so
 
 $(SOURCE)/lib$(APP_NAME).so:

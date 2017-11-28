@@ -180,7 +180,6 @@ bool CAddon::LoadSettings(bool bForce /* = false*/)
 
   if (!m_addonXmlDoc.LoadFile(addonFileName))
   {
-    CLog::Log(LOGERROR, "Error loading Settings %s", addonFileName.c_str());
     if (CFile::Exists(addonFileName))
       CLog::Log(LOGERROR, "Unable to load: %s, Line %d\n%s", addonFileName.c_str(), m_addonXmlDoc.ErrorRow(), m_addonXmlDoc.ErrorDesc());
     m_hasSettings = false;
@@ -215,15 +214,10 @@ bool CAddon::ReloadSettings()
 
 bool CAddon::LoadUserSettings()
 {
-  if (!CFile::Exists(m_userSettingsPath))
-    return false;
-
   m_userSettingsLoaded = false;
   CXBMCTinyXML doc;
   if (doc.LoadFile(m_userSettingsPath))
     m_userSettingsLoaded = SettingsFromXML(doc);
-  else
-    CLog::Log(LOGERROR, "Error loading addon settings to %s", m_userSettingsPath.c_str());
   return m_userSettingsLoaded;
 }
 
@@ -252,8 +246,7 @@ void CAddon::SaveSettings(void)
   // create the XML file
   CXBMCTinyXML doc;
   SettingsToXML(doc);
-  if (!doc.SaveFile(m_userSettingsPath))
-    CLog::Log(LOGERROR, "Error saving addon settings to %s", m_userSettingsPath.c_str());
+  doc.SaveFile(m_userSettingsPath);
   m_userSettingsLoaded = true;
   
   CAddonMgr::GetInstance().ReloadSettings(ID());//push the settings changes to the running addon instance

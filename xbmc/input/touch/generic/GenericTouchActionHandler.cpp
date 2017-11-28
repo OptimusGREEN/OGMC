@@ -19,9 +19,6 @@
  */
 
 #include "GenericTouchActionHandler.h"
-
-#include <cmath>
-
 #include "messaging/ApplicationMessenger.h"
 #include "guilib/GUIWindowManager.h"
 #include "input/Key.h"
@@ -36,9 +33,7 @@ CGenericTouchActionHandler &CGenericTouchActionHandler::GetInstance()
 }
 
 void CGenericTouchActionHandler::OnTouchAbort()
-{
-  sendEvent(ACTION_GESTURE_ABORT, 0.0f, 0.0f);
-}
+{ }
 
 bool CGenericTouchActionHandler::OnSingleTouchStart(float x, float y)
 {
@@ -91,14 +86,14 @@ bool CGenericTouchActionHandler::OnTouchGestureStart(float x, float y)
 
 bool CGenericTouchActionHandler::OnTouchGesturePan(float x, float y, float offsetX, float offsetY, float velocityX, float velocityY)
 {
-  sendEvent(ACTION_GESTURE_PAN, x, y, offsetX, offsetY, velocityX, velocityY);
+  sendEvent(ACTION_GESTURE_PAN, x, y, offsetX, offsetY);
 
   return true;
 }
 
 bool CGenericTouchActionHandler::OnTouchGestureEnd(float x, float y, float offsetX, float offsetY, float velocityX, float velocityY)
 {
-  sendEvent(ACTION_GESTURE_END, velocityX, velocityY, x, y, offsetX, offsetY);
+  sendEvent(ACTION_GESTURE_END, velocityX, velocityY, x, y);
 
   return true;
 }
@@ -108,7 +103,7 @@ void CGenericTouchActionHandler::OnTap(float x, float y, int32_t pointers /* = 1
   if (pointers <= 0 || pointers > 10)
     return;
 
-  sendEvent(ACTION_TOUCH_TAP, x, y, 0.0f, 0.0f, 0.0f, 0.0f, pointers);
+  sendEvent(ACTION_TOUCH_TAP, (uint16_t)x, (uint16_t)y, 0.0f, 0.0f, pointers);
 }
 
 void CGenericTouchActionHandler::OnLongPress(float x, float y, int32_t pointers /* = 1 */)
@@ -116,7 +111,7 @@ void CGenericTouchActionHandler::OnLongPress(float x, float y, int32_t pointers 
   if (pointers <= 0 || pointers > 10)
     return;
 
-  sendEvent(ACTION_TOUCH_LONGPRESS, x, y, 0.0f, 0.0f, 0.0f, 0.0f, pointers);
+  sendEvent(ACTION_TOUCH_LONGPRESS, (uint16_t)x, (uint16_t)y, 0.0f, 0.0f, pointers);
 }
 
 void CGenericTouchActionHandler::OnSwipe(TouchMoveDirection direction, float xDown, float yDown, float xUp, float yUp, float velocityX, float velocityY, int32_t pointers /* = 1 */)
@@ -136,7 +131,7 @@ void CGenericTouchActionHandler::OnSwipe(TouchMoveDirection direction, float xDo
   else
     return;
 
-  sendEvent(actionId, xUp, yUp, velocityX, velocityY, xDown, yDown, pointers);
+  sendEvent(actionId, xUp, yUp, velocityX, velocityY, pointers);
 }
 
 void CGenericTouchActionHandler::OnZoomPinch(float centerX, float centerY, float zoomFactor)
@@ -151,7 +146,7 @@ void CGenericTouchActionHandler::OnRotate(float centerX, float centerY, float an
 
 int CGenericTouchActionHandler::QuerySupportedGestures(float x, float y)
 {
-  CGUIMessage msg(GUI_MSG_GESTURE_NOTIFY, 0, 0, static_cast<int> (std::round(x)), static_cast<int> (std::round(y)));
+  CGUIMessage msg(GUI_MSG_GESTURE_NOTIFY, 0, 0, (int)x, (int)y);
   if (!g_windowManager.SendMessage(msg))
     return 0;
 
@@ -166,17 +161,32 @@ int CGenericTouchActionHandler::QuerySupportedGestures(float x, float y)
   return result;
 }
 
-void CGenericTouchActionHandler::sendEvent(int actionId, float x, float y, float x2 /* = 0.0f */, float y2 /* = 0.0f */, float x3, float y3, int pointers /* = 1 */)
+void CGenericTouchActionHandler::touch(uint8_t type, uint8_t button, uint16_t x, uint16_t y)
 {
-  XBMC_Event newEvent{XBMC_TOUCH};
+  XBMC_Event newEvent;
+  memset(&newEvent, 0, sizeof(newEvent));
   
+  newEvent.type = type;
+  newEvent.button.type = type;
+  newEvent.button.button = button;
+  newEvent.button.x = x;
+  newEvent.button.y = y;
+  
+  CWinEvents::MessagePush(&newEvent);
+}
+
+void CGenericTouchActionHandler::sendEvent(int actionId, float x, float y, float x2 /* = 0.0f */, float y2 /* = 0.0f */, int pointers /* = 1 */)
+{
+  XBMC_Event newEvent;
+  memset(&newEvent, 0, sizeof(newEvent));
+  
+  newEvent.type = XBMC_TOUCH;
+  newEvent.touch.type = XBMC_TOUCH;
   newEvent.touch.action = actionId;
   newEvent.touch.x = x;
   newEvent.touch.y = y;
   newEvent.touch.x2 = x2;
   newEvent.touch.y2 = y2;
-  newEvent.touch.x3 = x3;
-  newEvent.touch.y3 = y3;
   newEvent.touch.pointers = pointers;
 
   CWinEvents::MessagePush(&newEvent);
@@ -184,10 +194,13 @@ void CGenericTouchActionHandler::sendEvent(int actionId, float x, float y, float
 
 void CGenericTouchActionHandler::focusControl(float x, float y)
 {
-  XBMC_Event newEvent{XBMC_SETFOCUS};
+  XBMC_Event newEvent;
+  memset(&newEvent, 0, sizeof(newEvent));
 
-  newEvent.focus.x = static_cast<int> (std::round(x));
-  newEvent.focus.y = static_cast<int> (std::round(y));
+  newEvent.type = XBMC_SETFOCUS;
+  newEvent.focus.type = XBMC_SETFOCUS;
+  newEvent.focus.x = (uint16_t)x;
+  newEvent.focus.y = (uint16_t)y;
 
   CWinEvents::MessagePush(&newEvent);
 }

@@ -22,8 +22,6 @@
 #include "Application.h"
 #include "messaging/ApplicationMessenger.h"
 #include "ContextMenuManager.h"
-#include "FileItem.h"
-#include "video/VideoInfoTag.h"
 #include "FileItemListModification.h"
 #include "GUIPassword.h"
 #include "GUIUserMessages.h"
@@ -485,11 +483,7 @@ bool CGUIMediaWindow::OnMessage(CGUIMessage& message)
     {
       if (m_vecItems->GetPath() == "?")
         m_vecItems->SetPath("");
-      std::string path, fileName;
       std::string dir = message.GetStringParam(0);
-      URIUtils::Split(dir, path, fileName);
-      if (StringUtils::IsInteger(fileName))
-        dir = path;
       const std::string &ret = message.GetStringParam(1);
       bool returning = StringUtils::EqualsNoCase(ret, "return");
       if (!dir.empty())
@@ -783,21 +777,7 @@ bool CGUIMediaWindow::Update(const std::string &strDirectory, bool updateFilterP
   }
 
   if (m_vecItems->GetLabel().empty())
-  {
     m_vecItems->SetLabel(CUtil::GetTitleFromPath(m_vecItems->GetPath(), true));
-
-    // Removable sources
-    VECSOURCES removables;
-    g_mediaManager.GetRemovableDrives(removables);
-    for (auto s : removables)
-    {
-      if (URIUtils::CompareWithoutSlashAtEnd(s.strPath, m_vecItems->GetPath()))
-      {
-        m_vecItems->SetLabel(s.strName);
-        break;
-      }
-    }
-  }
 
   // check the given path for filter data
   UpdateFilterPath(path, *m_vecItems, updateFilterPath);
@@ -1016,9 +996,9 @@ bool CGUIMediaWindow::OnClick(int iItem, const std::string &player)
 #if defined(TARGET_ANDROID)
   else if (pItem->IsAndroidApp())
   {
-    CURL url(pItem->GetPath());
-    CLog::Log(LOGDEBUG, "CGUIMediaWindow::OnClick Trying to run: %s - %s", URIUtils::GetFileName(url.GetFileName()).c_str(), url.GetOption("class").c_str());
-    return CXBMCApp::StartAppActivity(URIUtils::GetFileName(url.GetFileName()), url.GetOption("class"));
+    std::string appName = URIUtils::GetFileName(pItem->GetPath());
+    CLog::Log(LOGDEBUG, "CGUIMediaWindow::OnClick Trying to run: %s",appName.c_str());
+    return CXBMCApp::StartActivity(appName);
   }
 #endif
   else
@@ -1381,14 +1361,7 @@ bool CGUIMediaWindow::OnPlayAndQueueMedia(const CFileItemPtr &item, std::string 
     std::string mainDVD; 
     for (int i = 0; i < m_vecItems->Size(); i++) 
     { 
-      CFileItemPtr nItem = m_vecItems->Get(i);
-
-      if (nItem->IsVideoDb())
-      {
-        nItem->SetPath(nItem->GetVideoInfoTag()->m_strFileNameAndPath);
-        nItem->SetProperty("original_listitem_url", nItem->GetPath());
-      }
-      std::string path = URIUtils::GetFileName(nItem->GetPath());
+      std::string path = URIUtils::GetFileName(m_vecItems->Get(i)->GetPath()); 
       if (StringUtils::EqualsNoCase(path, "VIDEO_TS.IFO")) 
       { 
         mainDVD = path; 
@@ -1453,10 +1426,9 @@ void CGUIMediaWindow::UpdateFileList()
   {
     int iPlaylist=m_guiState->GetPlaylist();
     int nSong = g_playlistPlayer.GetCurrentSong();
-
     CFileItem playlistItem;
-    if (iPlaylist > -1 && nSong > -1 && nSong < g_playlistPlayer.GetPlaylist(iPlaylist).size())
-      playlistItem = *g_playlistPlayer.GetPlaylist(iPlaylist)[nSong];
+    if (nSong > -1 && iPlaylist > -1)
+      playlistItem=*g_playlistPlayer.GetPlaylist(iPlaylist)[nSong];
 
     g_playlistPlayer.ClearPlaylist(iPlaylist);
     g_playlistPlayer.Reset();
