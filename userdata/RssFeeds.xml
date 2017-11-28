@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<rssfeeds>
-  <!--RSS feeds. To have multiple feeds, just add a feed to the set. You can also have multiple sets.-->
-  <!--To use different sets in your skin, each must be called from skin with a unique id.-->
-  <set id="1" rtl="false">
-    <feed updateinterval="1">special://xbmc/userdata/version.xml</feed>
-    <feed updateinterval="30">https://www.dropbox.com/s/rsuoaywaf12bo6a/app.xml?dl=1</feed>
-  </set>
-</rssfeeds>
