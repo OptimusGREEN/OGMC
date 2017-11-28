@@ -1,4 +1,4 @@
-package org.xbmc.@APP_NAME_LC@;
+package @APP_PACKAGE@;
 
 import android.app.NativeActivity;
 import android.content.ComponentName;
@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Handler;
-import org.xbmc.@APP_NAME_LC@.XBMCVideoView;
+import @APP_PACKAGE@.XBMCVideoView;
 
 public class Main extends NativeActivity implements Choreographer.FrameCallback
 {
@@ -78,7 +78,7 @@ public class Main extends NativeActivity implements Choreographer.FrameCallback
       }
     });
   }
-  
+
   public void registerMediaButtonEventReceiver()
   {
     AudioManager manager = (AudioManager) getSystemService(AUDIO_SERVICE);
@@ -202,7 +202,7 @@ public class Main extends NativeActivity implements Choreographer.FrameCallback
   {
     super.onPause();
   }
-  
+
   public void onDestroy()
   {
     // unregister the InputDeviceListener implementation
@@ -212,7 +212,7 @@ public class Main extends NativeActivity implements Choreographer.FrameCallback
     getApplicationContext().getContentResolver().unregisterContentObserver(mSettingsContentObserver);
     super.onDestroy();
   }
-  
+
   @Override
   public void doFrame(long frameTimeNanos)
   {
