@@ -170,6 +170,7 @@ bool CInputManager::ProcessMouse(int windowId)
     (float)m_Mouse.GetY(),
     (float)m_Mouse.GetDX(),
     (float)m_Mouse.GetDY(),
+    0.0f, 0.0f,
     mouseaction.GetName()));
 }
 
@@ -393,7 +394,7 @@ bool CInputManager::OnEvent(XBMC_Event& newEvent)
     }
     int actionId = 0;
     std::string actionString;
-    if (newEvent.touch.action == ACTION_GESTURE_BEGIN || newEvent.touch.action == ACTION_GESTURE_END)
+    if (newEvent.touch.action == ACTION_GESTURE_BEGIN || newEvent.touch.action == ACTION_GESTURE_END || newEvent.touch.action == ACTION_GESTURE_ABORT)
       actionId = newEvent.touch.action;
     else
     {
@@ -407,7 +408,7 @@ bool CInputManager::OnEvent(XBMC_Event& newEvent)
     if ((actionId >= ACTION_TOUCH_TAP && actionId <= ACTION_GESTURE_END)
         || (actionId >= ACTION_MOUSE_START && actionId <= ACTION_MOUSE_END))
     {
-      auto action = new CAction(actionId, 0, newEvent.touch.x, newEvent.touch.y, newEvent.touch.x2, newEvent.touch.y2);
+      auto action = new CAction(actionId, 0, newEvent.touch.x, newEvent.touch.y, newEvent.touch.x2, newEvent.touch.y2, newEvent.touch.x3, newEvent.touch.y3);
       CApplicationMessenger::GetInstance().PostMsg(TMSG_GUI_ACTION, WINDOW_INVALID, -1, static_cast<void*>(action));
     }
     else
@@ -523,7 +524,8 @@ bool CInputManager::OnKey(const CKey& key)
         action.GetID() == ACTION_SELECT_ITEM ||
         action.GetID() == ACTION_ENTER ||
         action.GetID() == ACTION_PREVIOUS_MENU ||
-        action.GetID() == ACTION_NAV_BACK))
+        action.GetID() == ACTION_NAV_BACK ||
+        action.GetID() == ACTION_VOICE_RECOGNIZE))
       {
         // the action isn't plain navigation - check for a keyboard-specific keymap
         action = CButtonTranslator::GetInstance().GetAction(WINDOW_DIALOG_KEYBOARD, key, false);

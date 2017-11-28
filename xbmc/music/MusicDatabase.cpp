@@ -1009,7 +1009,8 @@ bool CMusicDatabase::GetAlbum(int idAlbum, CAlbum& album, bool getSongs /* = tru
       " WHERE albumview.idAlbum = %ld "
       " ORDER BY albumartistview.iOrder", idAlbum);
 
-    CLog::Log(LOGDEBUG, "%s", sql.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s", sql.c_str());
     if (!m_pDS->query(sql)) return false;
     if (m_pDS->num_rows() == 0)
     {
@@ -1041,7 +1042,8 @@ bool CMusicDatabase::GetAlbum(int idAlbum, CAlbum& album, bool getSongs /* = tru
         " WHERE songview.idAlbum = %ld "
         " ORDER BY songview.iTrack, songartistview.idRole, songartistview.iOrder", idAlbum);
 
-      CLog::Log(LOGDEBUG, "%s", sql.c_str());
+      if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+        CLog::Log(LOGDEBUG, "%s", sql.c_str());
       if (!m_pDS->query(sql)) return false;
       if (m_pDS->num_rows() == 0)  //Album with no songs
       {
@@ -1078,7 +1080,8 @@ bool CMusicDatabase::GetAlbum(int idAlbum, CAlbum& album, bool getSongs /* = tru
         " FROM albuminfosong "
         " WHERE idAlbumInfo = %ld "" ORDER BY iTrack", idAlbum);
 
-      CLog::Log(LOGDEBUG, "%s", sql.c_str());
+      if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+        CLog::Log(LOGDEBUG, "%s", sql.c_str());
       if (!m_pDS->query(sql)) return false;
       while (!m_pDS->eof())
       {
@@ -2311,7 +2314,8 @@ bool CMusicDatabase::GetTop100(const std::string& strBaseDir, CFileItemList& ite
                       "order by iTimesPlayed desc "
                       "limit 100";
 
-    CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
     if (!m_pDS->query(strSQL)) return false;
     int iRowsFound = m_pDS->num_rows();
     if (iRowsFound == 0)
@@ -2356,7 +2360,8 @@ bool CMusicDatabase::GetTop100Albums(VECALBUMS& albums)
       "ORDER BY albumview.iTimesPlayed DESC LIMIT 100) "
       "ORDER BY albumview.iTimesPlayed DESC, albumartistview.iOrder";
 
-    CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
     if (!m_pDS->query(strSQL)) return false;
     int iRowsFound = m_pDS->num_rows();
     if (iRowsFound == 0)
@@ -2405,7 +2410,8 @@ bool CMusicDatabase::GetTop100AlbumSongs(const std::string& strBaseDir, CFileIte
       return false;
 
     std::string strSQL = StringUtils::Format("SELECT songview.*, albumview.* FROM songview JOIN albumview ON (songview.idAlbum = albumview.idAlbum) JOIN (SELECT song.idAlbum, SUM(song.iTimesPlayed) AS iTimesPlayedSum FROM song WHERE song.iTimesPlayed > 0 GROUP BY idAlbum ORDER BY iTimesPlayedSum DESC LIMIT 100) AS _albumlimit ON (songview.idAlbum = _albumlimit.idAlbum) ORDER BY _albumlimit.iTimesPlayedSum DESC");
-    CLog::Log(LOGDEBUG,"GetTop100AlbumSongs() query: %s", strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG,"GetTop100AlbumSongs() query: %s", strSQL.c_str());
     if (!m_pDS->query(strSQL)) return false;
 
     int iRowsFound = m_pDS->num_rows();
@@ -2454,7 +2460,8 @@ bool CMusicDatabase::GetRecentlyPlayedAlbums(VECALBUMS& albums)
       "ORDER BY albumview.lastplayed DESC, albumartistview.iorder ", 
       CAlbum::ReleaseTypeToString(CAlbum::Album).c_str(), RECENTLY_PLAYED_LIMIT);
 
-    CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
     if (!m_pDS->query(strSQL)) return false;
     int iRowsFound = m_pDS->num_rows();
     if (iRowsFound == 0)
@@ -2508,7 +2515,8 @@ bool CMusicDatabase::GetRecentlyPlayedAlbumSongs(const std::string& strBaseDir, 
       "JOIN songartistview ON songview.idSong = songartistview.idSong "
       "ORDER BY playedalbums.lastplayed DESC,songartistview.idsong, songartistview.idRole, songartistview.iOrder",
       g_advancedSettings.m_iMusicLibraryRecentlyAddedItems);
-    CLog::Log(LOGDEBUG,"GetRecentlyPlayedAlbumSongs() query: %s", strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG,"GetRecentlyPlayedAlbumSongs() query: %s", strSQL.c_str());
     if (!m_pDS->query(strSQL)) return false;
 
     int iRowsFound = m_pDS->num_rows();
@@ -2586,7 +2594,8 @@ bool CMusicDatabase::GetRecentlyAddedAlbums(VECALBUMS& albums, unsigned int limi
       "ORDER BY albumview.idAlbum desc, albumartistview.iOrder ",
        limit ? limit : g_advancedSettings.m_iMusicLibraryRecentlyAddedItems);
 
-    CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
     if (!m_pDS->query(strSQL)) return false;
     int iRowsFound = m_pDS->num_rows();
     if (iRowsFound == 0)
@@ -2643,7 +2652,8 @@ bool CMusicDatabase::GetRecentlyAddedAlbumSongs(const std::string& strBaseDir, C
         "JOIN songartistview ON songview.idSong = songartistview.idSong "
         "ORDER BY songview.idAlbum DESC, songview.idSong, songartistview.idRole, songartistview.iOrder ",
         limit ? limit : g_advancedSettings.m_iMusicLibraryRecentlyAddedItems);
-    CLog::Log(LOGDEBUG,"GetRecentlyAddedAlbumSongs() query: %s", strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG,"GetRecentlyAddedAlbumSongs() query: %s", strSQL.c_str());
     if (!m_pDS->query(strSQL)) return false;
 
     int iRowsFound = m_pDS->num_rows();
@@ -2774,17 +2784,20 @@ bool CMusicDatabase::Search(const std::string& search, CFileItemList &items)
   unsigned int time = XbmcThreads::SystemClockMillis();
   // first grab all the artists that match
   SearchArtists(search, items);
-  CLog::Log(LOGDEBUG, "%s Artist search in %i ms",
+  if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+    CLog::Log(LOGDEBUG, "%s Artist search in %i ms",
             __FUNCTION__, XbmcThreads::SystemClockMillis() - time); time = XbmcThreads::SystemClockMillis();
 
   // then albums that match
   SearchAlbums(search, items);
-  CLog::Log(LOGDEBUG, "%s Album search in %i ms",
+  if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+    CLog::Log(LOGDEBUG, "%s Album search in %i ms",
             __FUNCTION__, XbmcThreads::SystemClockMillis() - time); time = XbmcThreads::SystemClockMillis();
 
   // and finally songs
   SearchSongs(search, items);
-  CLog::Log(LOGDEBUG, "%s Songs search in %i ms",
+  if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+    CLog::Log(LOGDEBUG, "%s Songs search in %i ms",
             __FUNCTION__, XbmcThreads::SystemClockMillis() - time); time = XbmcThreads::SystemClockMillis();
   return true;
 }
@@ -3506,7 +3519,8 @@ bool CMusicDatabase::GetGenresNav(const std::string& strBaseDir, CFileItemList& 
     strSQL = PrepareSQL(strSQL.c_str(), !extFilter.fields.empty() && extFilter.fields.compare("*") != 0 ? extFilter.fields.c_str() : "genre.*") + strSQLExtra;
 
     // run query
-    CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
 
     if (!m_pDS->query(strSQL))
       return false;
@@ -3578,7 +3592,8 @@ bool CMusicDatabase::GetYearsNav(const std::string& strBaseDir, CFileItemList& i
       return false;
 
     // run query
-    CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
     if (!m_pDS->query(strSQL))
       return false;
     int iRowsFound = m_pDS->num_rows();
@@ -3640,7 +3655,8 @@ bool CMusicDatabase::GetRolesNav(const std::string& strBaseDir, CFileItemList& i
       return false;
 
     // run query
-    CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
     if (!m_pDS->query(strSQL))
       return false;
     int iRowsFound = m_pDS->num_rows();
@@ -3725,7 +3741,8 @@ bool CMusicDatabase::GetCommonNav(const std::string &strBaseDir, const std::stri
       return false;
     
     // run query
-    CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
     if (!m_pDS->query(strSQL))
       return false;
     
@@ -3812,7 +3829,8 @@ bool CMusicDatabase::GetArtistsNav(const std::string& strBaseDir, CFileItemList&
       musicUrl.AddOption("albumartistsonly", albumArtistsOnly);
 
     bool result = GetArtistsByWhere(musicUrl.ToString(), filter, items, sortDescription, countOnly);
-    CLog::Log(LOGDEBUG,"Time to retrieve artists from dataset = %i", XbmcThreads::SystemClockMillis() - time);
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG,"Time to retrieve artists from dataset = %i", XbmcThreads::SystemClockMillis() - time);
 
     return result;
   }
@@ -3884,7 +3902,8 @@ bool CMusicDatabase::GetArtistsByWhere(const std::string& strBaseDir, const Filt
     strSQL = PrepareSQL(strSQL.c_str(), !extFilter.fields.empty() && extFilter.fields.compare("*") != 0 ? extFilter.fields.c_str() : "artistview.*") + strSQLExtra;
 
     // run query
-    CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
     if (!m_pDS->query(strSQL)) return false;
     int iRowsFound = m_pDS->num_rows();
     if (iRowsFound == 0)
@@ -4042,12 +4061,14 @@ bool CMusicDatabase::GetAlbumsByWhere(const std::string &baseDir, const Filter &
 
     strSQL = PrepareSQL(strSQL, !filter.fields.empty() && filter.fields.compare("*") != 0 ? filter.fields.c_str() : "albumview.*") + strSQLExtra;
 
-    CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
     // run query
     unsigned int time = XbmcThreads::SystemClockMillis();
     if (!m_pDS->query(strSQL))
       return false;
-    CLog::Log(LOGDEBUG, "%s - query took %i ms",
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s - query took %i ms",
               __FUNCTION__, XbmcThreads::SystemClockMillis() - time); time = XbmcThreads::SystemClockMillis();
 
     int iRowsFound = m_pDS->num_rows();
@@ -4171,12 +4192,14 @@ bool CMusicDatabase::GetAlbumsByWhere(const std::string &baseDir, const Filter &
       strSQL = "SELECT albumview.*, albumartistview.* "
                "FROM albumview JOIN albumartistview ON albumartistview.idalbum = albumview.idalbum " + strSQLExtra;
     
-    CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query: %s", __FUNCTION__, strSQL.c_str());
     // run query
     unsigned int time = XbmcThreads::SystemClockMillis();
     if (!m_pDS->query(strSQL))
       return false;
-    CLog::Log(LOGDEBUG, "%s - query took %i ms",
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s - query took %i ms",
       __FUNCTION__, XbmcThreads::SystemClockMillis() - time); time = XbmcThreads::SystemClockMillis();
 
     int iRowsFound = m_pDS->num_rows();
@@ -4302,7 +4325,8 @@ bool CMusicDatabase::GetSongsFullByWhere(const std::string &baseDir, const Filte
     else
       strSQL = "SELECT songview.* FROM songview " + strSQLExtra;
 
-    CLog::Log(LOGDEBUG, "%s query = %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query = %s", __FUNCTION__, strSQL.c_str());
     // run query
     if (!m_pDS->query(strSQL))
       return false;
@@ -4394,7 +4418,8 @@ bool CMusicDatabase::GetSongsFullByWhere(const std::string &baseDir, const Filte
       for (int i = 0; i < items.Size(); ++i)
         cueLoader.Load(LoadCuesheet(items[i]->GetMusicInfoTag()->GetURL()), items[i]);
     }
-    CLog::Log(LOGDEBUG, "%s(%s) - took %d ms", __FUNCTION__, filter.where.c_str(), XbmcThreads::SystemClockMillis() - time);
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s(%s) - took %d ms", __FUNCTION__, filter.where.c_str(), XbmcThreads::SystemClockMillis() - time);
     return true;
   }
   catch (...)
@@ -4447,7 +4472,8 @@ bool CMusicDatabase::GetSongsByWhere(const std::string &baseDir, const Filter &f
 
     strSQL = PrepareSQL(strSQL, !filter.fields.empty() && filter.fields.compare("*") != 0 ? filter.fields.c_str() : "songview.*") + strSQLExtra;
 
-    CLog::Log(LOGDEBUG, "%s query = %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query = %s", __FUNCTION__, strSQL.c_str());
     // run query
     if (!m_pDS->query(strSQL))
       return false;
@@ -4502,7 +4528,8 @@ bool CMusicDatabase::GetSongsByWhere(const std::string &baseDir, const Filter &f
     for (int i = 0; i < items.Size(); ++i)
       cueLoader.Load(LoadCuesheet(items[i]->GetMusicInfoTag()->GetURL()), items[i]);
 
-    CLog::Log(LOGDEBUG, "%s(%s) - took %d ms", __FUNCTION__, filter.where.c_str(), XbmcThreads::SystemClockMillis() - time);
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s(%s) - took %d ms", __FUNCTION__, filter.where.c_str(), XbmcThreads::SystemClockMillis() - time);
     return true;
   }
   catch (...)
@@ -5886,7 +5913,7 @@ void CMusicDatabase::ExportToXML(const std::string &xmlFile, bool singleFile, bo
       if (!singleFile)
       {
         if (!CDirectory::Exists(strPath))
-          CLog::Log(LOGDEBUG, "%s - Not exporting item %s as it does not exist", __FUNCTION__, strPath.c_str());
+          CLog::Log(LOGWARNING, "%s - Not exporting item %s as it does not exist", __FUNCTION__, strPath.c_str());
         else
         {
           std::string nfoFile = URIUtils::AddFileToFolder(strPath, "album.nfo");
@@ -5961,7 +5988,7 @@ void CMusicDatabase::ExportToXML(const std::string &xmlFile, bool singleFile, bo
       if (!singleFile)
       {
         if (!CDirectory::Exists(strPath))
-          CLog::Log(LOGDEBUG, "%s - Not exporting item %s as it does not exist", __FUNCTION__, strPath.c_str());
+          CLog::Log(LOGWARNING, "%s - Not exporting item %s as it does not exist", __FUNCTION__, strPath.c_str());
         else
         {
           std::string nfoFile = URIUtils::AddFileToFolder(strPath, "artist.nfo");

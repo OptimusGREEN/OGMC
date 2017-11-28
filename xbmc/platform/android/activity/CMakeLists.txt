@@ -7,6 +7,14 @@ set(SOURCES android_main.cpp
             EventLoop.cpp
             GraphicBuffer.cpp
             JNIMainActivity.cpp
+            JNIXBMCMainView.cpp
+            JNIXBMCMediaSession.cpp
+            JNIXBMCVideoView.cpp
+            JNIXBMCAudioManagerOnAudioFocusChangeListener.cpp
+            JNIXBMCSurfaceTextureOnFrameAvailableListener.cpp
+            JNIXBMCNsdManagerDiscoveryListener.cpp
+            JNIXBMCNsdManagerRegistrationListener.cpp
+            JNIXBMCNsdManagerResolveListener.cpp
             XBMCApp.cpp
             ${NDKROOT}/sources/android/native_app_glue/android_native_app_glue.c
             ${NDKROOT}/sources/android/cpufeatures/cpu-features.c)
@@ -22,6 +30,14 @@ set(HEADERS AndroidExtra.h
             GraphicBuffer.h
             IActivityHandler.h
             JNIMainActivity.h
+            JNIXBMCMainView.h
+            JNIXBMCMediaSession.h
+            JNIXBMCVideoView.h
+            JNIXBMCAudioManagerOnAudioFocusChangeListener.h
+            JNIXBMCSurfaceTextureOnFrameAvailableListener.h
+            JNIXBMCNsdManagerDiscoveryListener.h
+            JNIXBMCNsdManagerRegistrationListener.h
+            JNIXBMCNsdManagerResolveListener.h
             XBMCApp.h)
 
 core_add_library(platform_android_activity)

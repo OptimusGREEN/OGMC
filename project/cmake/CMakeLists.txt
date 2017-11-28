@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(kodi LANGUAGES CXX C ASM)
+project(spmc LANGUAGES CXX C ASM)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/modules)
 if(DEPENDS_DIR)
@@ -52,9 +52,9 @@ if(UNIX)
   option(ENABLE_INTERNAL_CROSSGUID "Enable internal crossguid?" ON)
   option(ENABLE_OPENSSL     "Enable OpenSSL?" ON)
   option(ENABLE_SDL         "Enable SDL?" OFF)
+  option(ENABLE_AML         "Enable AML?" OFF)
   if(CORE_SYSTEM_NAME STREQUAL linux OR CORE_SYSTEM_NAME STREQUAL freebsd)
     option(ENABLE_X11         "Enable X11 support?" ON)
-    option(ENABLE_AML         "Enable AML?" OFF)
     option(ENABLE_IMX         "Enable IMX?" OFF)
   endif()
 endif()
@@ -117,7 +117,7 @@ endif()
 # Optional dependencies
 set(optional_deps LCMS2 MicroHttpd MySqlClient SSH XSLT
                   Alsa UDEV DBus Avahi SmbClient CCache
-                  PulseAudio VDPAU VAAPI Bluetooth CAP)
+                  PulseAudio VDPAU VAAPI Bluetooth CAP Breakpad)
 
 # Required, dyloaded deps
 set(required_dyload Curl ASS)

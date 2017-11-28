@@ -21,13 +21,21 @@
 
 #include <android/input.h>
 
-class CAndroidMouse
+#include "system.h"
+
+#include "guilib/DispResource.h"
+#include "guilib/Geometry.h"
+
+class CAndroidMouse : public IDispResource
 {
 
 public:
   CAndroidMouse();
   virtual ~CAndroidMouse();
   bool onMouseEvent(AInputEvent* event);
+
+  // IDispResource Intf
+  virtual void OnResetDisplay() override;
 
 protected:
 

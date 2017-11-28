@@ -922,6 +922,7 @@ EVENT_RESULT CGUIEPGGridContainer::OnMouseEvent(const CPoint &point, const CMous
       return EVENT_RESULT_HANDLED;
     }
   case ACTION_GESTURE_END:
+  case ACTION_GESTURE_ABORT:
     {
       // we're done with exclusive access
       CGUIMessage msg(GUI_MSG_EXCLUSIVE_MOUSE, 0, GetParentID());

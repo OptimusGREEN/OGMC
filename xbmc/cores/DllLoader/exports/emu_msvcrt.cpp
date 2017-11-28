@@ -74,9 +74,7 @@
 #include "utils/CharsetConverter.h"
 #include "utils/URIUtils.h"
 #endif
-#if defined(TARGET_ANDROID)
-#include "platform/android/loader/AndroidDyload.h"
-#elif !defined(TARGET_WINDOWS)
+#if !defined(TARGET_WINDOWS)
 #include <dlfcn.h>
 #endif
 #include "utils/Environment.h"
@@ -455,10 +453,7 @@ extern "C"
 
   void *dll_dlopen(const char *filename, int flag)
   {
-#if defined(TARGET_ANDROID)
-    CAndroidDyload temp;
-    return temp.Open(filename);
-#elif !defined(TARGET_WINDOWS)
+#if !defined(TARGET_WINDOWS)
     return dlopen(filename, flag);
 #else
     return NULL;
@@ -482,7 +477,7 @@ extern "C"
       int nmode = convert_fmode(mode);
       if( (o->mode & nmode) != nmode)
         CLog::Log(LOGWARNING, "dll_fdopen - mode 0x%x differs from fd mode 0x%x", nmode, o->mode);
-      return &o->file_emu;
+      return reinterpret_cast<FILE*>(o);
     }
     else if (!IS_STD_DESCRIPTOR(fd))
     {
@@ -545,7 +540,8 @@ extern "C"
         return -1;
       }
       object->mode = iMode;
-      return g_emuFileWrapper.GetDescriptorByStream(&object->file_emu);
+      FILE* f = reinterpret_cast<FILE*>(object);
+      return g_emuFileWrapper.GetDescriptorByStream(f);
     }
     delete pFile;
     return -1;
@@ -1394,16 +1390,18 @@ extern "C"
     {
        return (off64_t)pFile->GetPosition();
     }
+#if !defined(TARGET_ANDROID) || defined(__LP64__)
     else if (!IS_STD_STREAM(stream))
     {
       // it might be something else than a file, or the file is not emulated
       // let the operating system handle it
-#if defined(TARGET_DARWIN) || defined(TARGET_FREEBSD) || defined(TARGET_ANDROID)
+#if defined(TARGET_DARWIN) || defined(TARGET_FREEBSD)
       return ftello(stream);
 #else
       return ftello64(stream);
 #endif
     }
+#endif
     CLog::Log(LOGERROR, "%s emulated function failed",  __FUNCTION__);
     return -1;
   }
@@ -1642,12 +1640,14 @@ extern "C"
 #endif
       return 0;
     }
+#if !defined(TARGET_ANDROID) || defined(__LP64__)
     else if (!IS_STD_STREAM(stream))
     {
       // it might be something else than a file, or the file is not emulated
       // let the operating system handle it
       return fgetpos(stream, pos);
     }
+#endif
     CLog::Log(LOGERROR, "%s emulated function failed",  __FUNCTION__);
     return EINVAL;
   }
@@ -1670,6 +1670,7 @@ extern "C"
         return EINVAL;
       }
     }
+#if !defined(TARGET_ANDROID) || defined(__LP64__)
     else if (!IS_STD_STREAM(stream))
     {
       // it might be something else than a file, or the file is not emulated
@@ -1680,6 +1681,7 @@ extern "C"
       return fsetpos64(stream, pos);
 #endif
     }
+#endif
     CLog::Log(LOGERROR, "%s emulated function failed",  __FUNCTION__);
     return EINVAL;
   }
@@ -1697,12 +1699,14 @@ extern "C"
 #endif
       return dll_fsetpos64(stream, &tmpPos);
     }
+#if !defined(TARGET_ANDROID) || defined(__LP64__)
     else if (!IS_STD_STREAM(stream))
     {
       // it might be something else than a file, or the file is not emulated
       // let the operating system handle it
       return fsetpos(stream, (fpos_t*)pos);
     }
+#endif
     CLog::Log(LOGERROR, "%s emulated function failed",  __FUNCTION__);
     return EINVAL;
   }

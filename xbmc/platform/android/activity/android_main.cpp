@@ -22,21 +22,37 @@
 
 #include <stdlib.h>
 #include <errno.h>
+
 #include <android_native_app_glue.h>
-#include "EventLoop.h"
-#include "XBMCApp.h"
-#include "platform/android/jni/SurfaceTexture.h"
-#include "utils/StringUtils.h"
+
+#include <androidjni/SurfaceTexture.h>
+
 #include "CompileInfo.h"
+#include "EventLoop.h"
+#if defined(HAVE_BREAKPAD)
+#define __STDC_FORMAT_MACROS
+#include "client/linux/handler/minidump_descriptor.h"
+#include "client/linux/handler/exception_handler.h"
+#endif
 
 #include "platform/android/activity/JNIMainActivity.h"
+#include "platform/android/activity/JNIXBMCMainView.h"
+#include "platform/android/activity/JNIXBMCVideoView.h"
+#include "platform/android/activity/JNIXBMCAudioManagerOnAudioFocusChangeListener.h"
+#include "platform/android/activity/JNIXBMCSurfaceTextureOnFrameAvailableListener.h"
+#include "platform/android/activity/JNIXBMCNsdManagerDiscoveryListener.h"
+#include "platform/android/activity/JNIXBMCMediaSession.h"
+#include "platform/android/activity/JNIXBMCNsdManagerRegistrationListener.h"
+#include "platform/android/activity/JNIXBMCNsdManagerResolveListener.h"
+#include "utils/StringUtils.h"
+#include "XBMCApp.h"
 
 
 // redirect stdout / stderr to logcat
 // https://codelab.wordpress.com/2014/11/03/how-to-use-standard-output-streams-for-logging-in-android-apps/
 static int pfd[2];
 static pthread_t thr;
-static const char *tag = "myapp";
+static char tag[20];
 
 static void *thread_logger(void*)
 {
@@ -54,7 +70,8 @@ static void *thread_logger(void*)
 
 int start_logger(const char *app_name)
 {
-  tag = app_name;
+  strncpy(tag, app_name, 20);
+  strcat(tag, "_STD");
 
   /* make stdout line-buffered and stderr unbuffered */
   setvbuf(stdout, 0, _IOLBF, 0);
@@ -72,6 +89,24 @@ int start_logger(const char *app_name)
   return 0;
 }
 
+#if defined(HAVE_BREAKPAD)
+static void *startCrashHandler(void* arg)
+{
+  CJNIMainActivity::startCrashHandler();
+  return NULL;
+}
+
+static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
+                          void* context, bool succeeded)
+{
+  // Issue with breakpad to use JNI from callback. Have to use a thread
+  // https://code.google.com/p/android/issues/detail?id=162663
+  pthread_t t;
+  pthread_create(&t, NULL, startCrashHandler, NULL);
+  pthread_join(t, NULL);
+  return succeeded;
+}
+#endif
 
 // copied from new android_native_app_glue.c
 static void process_input(struct android_app* app, struct android_poll_source* source) {
@@ -107,7 +142,16 @@ extern void android_main(struct android_app* state)
     CXBMCApp xbmcApp(state->activity);
     if (xbmcApp.isValid())
     {
-      start_logger("Kodi");
+      start_logger(CCompileInfo::GetAppName());
+#if defined(HAVE_BREAKPAD)
+      google_breakpad::MinidumpDescriptor descriptor(google_breakpad::MinidumpDescriptor::kMicrodumpOnConsole);
+      google_breakpad::ExceptionHandler eh(descriptor,
+                                        NULL,
+                                        dumpCallback,
+                                        NULL,
+                                        true,
+                                        -1);
+#endif
 
       IInputHandler inputHandler;
       eventLoop.run(xbmcApp, inputHandler);
@@ -132,93 +176,72 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
   if (vm->GetEnv(reinterpret_cast<void**>(&env), version) != JNI_OK)
     return -1;
 
-  std::string appName = CCompileInfo::GetAppName();
-  StringUtils::ToLower(appName);
-  std::string mainClass = "org/xbmc/" + appName + "/Main";
-  std::string bcReceiver = "org/xbmc/" + appName + "/XBMCBroadcastReceiver";
-  std::string frameListener = "org/xbmc/" + appName + "/XBMCOnFrameAvailableListener";
-  std::string settingsObserver = "org/xbmc/" + appName + "/XBMCSettingsContentObserver";
-  std::string audioFocusChangeListener = "org/xbmc/" + appName + "/XBMCOnAudioFocusChangeListener";
-  std::string inputDeviceListener = "org/xbmc/" + appName + "/XBMCInputDeviceListener";
+  std::string pkgRoot = CCompileInfo::GetClass();
+  
+  std::string mainClass = pkgRoot + "/Main";
+  std::string bcReceiver = pkgRoot + "/XBMCBroadcastReceiver";
+  std::string settingsObserver = pkgRoot + "/XBMCSettingsContentObserver";
+  std::string inputDeviceListener = pkgRoot + "/XBMCInputDeviceListener";
 
+  CJNIXBMCAudioManagerOnAudioFocusChangeListener::RegisterNatives(env);
+  CJNIXBMCSurfaceTextureOnFrameAvailableListener::RegisterNatives(env);
+  CJNIXBMCMainView::RegisterNatives(env);
+  CJNIXBMCVideoView::RegisterNatives(env);
+  jni::CJNIXBMCNsdManagerDiscoveryListener::RegisterNatives(env);
+  jni::CJNIXBMCNsdManagerRegistrationListener::RegisterNatives(env);
+  jni::CJNIXBMCNsdManagerResolveListener::RegisterNatives(env);
+  jni::CJNIXBMCMediaSession::RegisterNatives(env);
+  
   jclass cMain = env->FindClass(mainClass.c_str());
   if(cMain)
   {
-    JNINativeMethod mOnNewIntent = {
-      "_onNewIntent",
-      "(Landroid/content/Intent;)V",
-      (void*)&CJNIMainActivity::_onNewIntent
+    JNINativeMethod methods[] = 
+    {
+      {"_onNewIntent", "(Landroid/content/Intent;)V", (void*)&CJNIMainActivity::_onNewIntent},
+      {"_onActivityResult", "(IILandroid/content/Intent;)V", (void*)&CJNIMainActivity::_onActivityResult},
+      {"_doFrame", "(J)V", (void*)&CJNIMainActivity::_doFrame},
+      {"_callNative", "(JJ)V", (void*)&CJNIMainActivity::_callNative},
+      {"_onCaptureAvailable", "(Landroid/media/Image;)V", (void*)&CJNIMainActivity::_onCaptureAvailable},
+      {"_onScreenshotAvailable", "(Landroid/media/Image;)V", (void*)&CJNIMainActivity::_onScreenshotAvailable},
+      {"_onVisibleBehindCanceled", "()V", (void*)&CJNIMainActivity::_onVisibleBehindCanceled},
+      {"_onMultiWindowModeChanged", "(Z)V", (void*)&CJNIMainActivity::_onMultiWindowModeChanged},
+      {"_onPictureInPictureModeChanged", "(Z)V", (void*)&CJNIMainActivity::_onPictureInPictureModeChanged},
+      {"_onAudioDeviceAdded", "([Landroid/media/AudioDeviceInfo;)V", (void*)&CJNIMainActivity::_onAudioDeviceAdded},
+      {"_onAudioDeviceRemoved", "([Landroid/media/AudioDeviceInfo;)V", (void*)&CJNIMainActivity::_onAudioDeviceRemoved},
     };
-    env->RegisterNatives(cMain, &mOnNewIntent, 1);
-
-    JNINativeMethod mDoFrame = {
-      "_doFrame",
-      "(J)V",
-      (void*)&CJNIMainActivity::_doFrame
-    };
-    env->RegisterNatives(cMain, &mDoFrame, 1);
-
-    JNINativeMethod mCallNative = {
-      "_callNative",
-      "(JJ)V",
-      (void*)&CJNIMainActivity::_callNative
-    };
-    env->RegisterNatives(cMain, &mCallNative, 1);
+    env->RegisterNatives(cMain, methods, sizeof(methods)/sizeof(methods[0]));
   }
 
   jclass cBroadcastReceiver = env->FindClass(bcReceiver.c_str());
   if(cBroadcastReceiver)
   {
-    JNINativeMethod mOnReceive =  {
-      "_onReceive",
-      "(Landroid/content/Intent;)V",
-      (void*)&CJNIBroadcastReceiver::_onReceive
+    JNINativeMethod methods[] = 
+    {
+      {"_onReceive", "(Landroid/content/Intent;)V", (void*)&CJNIBroadcastReceiver::_onReceive},
     };
-    env->RegisterNatives(cBroadcastReceiver, &mOnReceive, 1);
-  }
-
-  jclass cFrameAvailableListener = env->FindClass(frameListener.c_str());
-  if(cFrameAvailableListener)
-  {
-    JNINativeMethod mOnFrameAvailable = {
-      "_onFrameAvailable",
-      "(Landroid/graphics/SurfaceTexture;)V",
-      (void*)&CJNISurfaceTextureOnFrameAvailableListener::_onFrameAvailable
-    };
-    env->RegisterNatives(cFrameAvailableListener, &mOnFrameAvailable, 1);
+    env->RegisterNatives(cBroadcastReceiver, methods, sizeof(methods)/sizeof(methods[0]));
   }
 
   jclass cSettingsObserver = env->FindClass(settingsObserver.c_str());
   if(cSettingsObserver)
   {
-    JNINativeMethod mOnVolumeChanged = {
-      "_onVolumeChanged",
-      "(I)V",
-      (void*)&CJNIMainActivity::_onVolumeChanged
+    JNINativeMethod methods[] = 
+    {
+      {"_onVolumeChanged", "(I)V", (void*)&CJNIMainActivity::_onVolumeChanged},
     };
-    env->RegisterNatives(cSettingsObserver, &mOnVolumeChanged, 1);
-  }
-
-  jclass cAudioFocusChangeListener = env->FindClass(audioFocusChangeListener.c_str());
-  if(cAudioFocusChangeListener)
-  {
-    JNINativeMethod mOnAudioFocusChange = {
-      "_onAudioFocusChange",
-      "(I)V",
-      (void*)&CJNIMainActivity::_onAudioFocusChange
-    };
-    env->RegisterNatives(cAudioFocusChangeListener, &mOnAudioFocusChange, 1);
+    env->RegisterNatives(cSettingsObserver, methods, sizeof(methods)/sizeof(methods[0]));
   }
 
   jclass cInputDeviceListener = env->FindClass(inputDeviceListener.c_str());
   if(cInputDeviceListener)
   {
-    JNINativeMethod mInputDeviceCallbacks[3] = {
+    JNINativeMethod methods[] = 
+    {
       { "_onInputDeviceAdded", "(I)V", (void*)&CJNIMainActivity::_onInputDeviceAdded },
       { "_onInputDeviceChanged", "(I)V", (void*)&CJNIMainActivity::_onInputDeviceChanged },
       { "_onInputDeviceRemoved", "(I)V", (void*)&CJNIMainActivity::_onInputDeviceRemoved }
     };
-    env->RegisterNatives(cInputDeviceListener, mInputDeviceCallbacks, 3);
+    env->RegisterNatives(cInputDeviceListener, methods, sizeof(methods)/sizeof(methods[0]));
   }
 
   return version;

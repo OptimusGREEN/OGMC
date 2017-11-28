@@ -46,6 +46,7 @@
       <enter mod="longpress">ContextMenu</enter>
       <enter mod="ctrl">Enter</enter>
       <backspace>Back</backspace>
+      <backspace mod="longpress">PictureInPicture</backspace>
       <browser_back>Back</browser_back>
       <browser_back mod="longpress">ActivateWindow(Home)</browser_back>
       <key id='65446'>Back</key>
@@ -127,8 +128,8 @@
       <stop>Stop</stop>
       <play_pause>PlayPause</play_pause>
       <play_pause mod="longpress">Info</play_pause>
-      <fastforward>FastForward</fastforward>
-      <rewind>Rewind</rewind>
+      <fastforward>PageDown</fastforward>
+      <rewind>PageUp</rewind>
       <record/>
       <launch_mail></launch_mail>
       <launch_media_select>ActivateWindow(Music)</launch_media_select>
@@ -194,6 +195,11 @@
       <browser_back>Backspace</browser_back>
       <browser_back mod="longpress">PreviousMenu</browser_back>
       <play_pause mod="longpress">Enter</play_pause>
+      <browser_search>VoiceRecognizer</browser_search>
+      <menu>VoiceRecognizer</menu>
+      <return mod="longpress">VoiceRecognizer</return>
+      <enter mod="longpress">VoiceRecognizer</enter>
+      <play_pause>VoiceRecognizer</play_pause>
     </keyboard>
   </VirtualKeyboard>
   <TVChannels>
@@ -325,14 +331,16 @@
   </Music>
   <FullscreenVideo>
     <keyboard>
+      <fastforward>FastForward</fastforward>
+      <rewind>Rewind</rewind>
       <f>FastForward</f>
       <r>Rewind</r>
       <period>StepForward</period>
       <comma>StepBack</comma>
-      <backspace>Fullscreen</backspace>
-      <backspace mod="longpress">Stop</backspace>
-      <browser_back>Fullscreen</browser_back>
-      <browser_back mod="longpress">Stop</browser_back>
+      <backspace>Stop</backspace>
+      <backspace mod="longpress">PictureInPicture</backspace>
+      <browser_back>Stop</browser_back>
+      <browser_back mod="longpress">PictureInPicture</browser_back>
       <quote>Seek(-7)</quote> <!-- Replaces smallstepback -->
       <opensquarebracket>BigStepForward</opensquarebracket>
       <closesquarebracket>BigStepBack</closesquarebracket>
@@ -342,6 +350,7 @@
       <enter mod="longpress">PlayPause</enter>
       <m>OSD</m>
       <menu>OSD</menu>
+      <menu mod="longpress">CodecInfo</menu>
       <i>Info</i>
       <o>PlayerProcessInfo</o>
       <o mod="ctrl,shift">PlayerDebug</o>
@@ -383,6 +392,8 @@
   </VideoTimeSeek>
   <FullscreenInfo>
     <keyboard>
+      <fastforward>FastForward</fastforward>
+      <rewind>Rewind</rewind>
       <f>FastForward</f>
       <r>Rewind</r>
       <period>StepForward</period>
@@ -400,6 +411,8 @@
   </PlayerControls>
   <Visualisation>
     <keyboard>
+      <fastforward>FastForward</fastforward>
+      <rewind>Rewind</rewind>
       <f>FastForward</f>
       <r>Rewind</r>
       <period>SkipNext</period>
@@ -436,6 +449,8 @@
   </Visualisation>
   <MusicOSD>
     <keyboard>
+      <fastforward>FastForward</fastforward>
+      <rewind>Rewind</rewind>
       <f>FastForward</f>
       <r>Rewind</r>
       <period>SkipNext</period>
@@ -452,6 +467,8 @@
   </MusicOSD>
   <VisualisationPresetList>
     <keyboard>
+      <fastforward>FastForward</fastforward>
+      <rewind>Rewind</rewind>
       <f>FastForward</f>
       <r>Rewind</r>
       <period>SkipNext</period>
@@ -487,6 +504,8 @@
       <enter>Rotate</enter>
       <r>Rotate</r>
       <backspace mod="longpress">ActivateWindow(Home)</backspace>
+      <channel_up>ZoomIn</channel_up>
+      <channel_down>ZoomOut</channel_down>
     </keyboard>
   </SlideShow>
   <ScreenCalibration>

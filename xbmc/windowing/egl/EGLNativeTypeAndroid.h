@@ -23,8 +23,9 @@
 #include <string>
 #include <vector>
 
+#include <androidjni/Display.h>
+
 #include "EGLNativeType.h"
-#include "platform/android/jni/Display.h"
 
 class CEGLNativeTypeAndroid : public CEGLNativeType
 {
@@ -51,8 +52,10 @@ public:
   virtual bool  GetPreferredResolution(RESOLUTION_INFO *res) const;
 
   virtual bool  ShowWindow(bool show);
+  virtual bool  BringToFront();
 
 protected:
   int m_width;
   int m_height;
+
 };

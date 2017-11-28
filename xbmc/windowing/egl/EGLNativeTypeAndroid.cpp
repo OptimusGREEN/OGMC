@@ -19,23 +19,24 @@
  */
 #include <stdlib.h>
 
-#include "system.h"
+#include <androidjni/SystemProperties.h>
+#include <androidjni/Display.h>
+#include <androidjni/View.h>
+#include <androidjni/Window.h>
+#include <androidjni/WindowManager.h>
+#include <androidjni/Build.h>
+#include <androidjni/System.h>
+
 #include <EGL/egl.h>
 #include "EGLNativeTypeAndroid.h"
-#include "utils/log.h"
-#include "settings/Settings.h"
 #include "guilib/gui3d.h"
-#include "platform/android/activity/XBMCApp.h"
+#include "utils/log.h"
+#include "system.h"
+#include "settings/Settings.h"
+#include "ServiceBroker.h"
 #include "utils/StringUtils.h"
-#include "platform/android/jni/SystemProperties.h"
-#include "platform/android/jni/Display.h"
-#include "platform/android/jni/View.h"
-#include "platform/android/jni/Window.h"
-#include "platform/android/jni/WindowManager.h"
-#include "platform/android/jni/Build.h"
-#include "platform/android/jni/System.h"
-
 #include "utils/SysfsUtils.h"
+#include "platform/android/activity/XBMCApp.h"
 
 static bool s_hasModeApi = false;
 static std::vector<RESOLUTION_INFO> s_res_displayModes;
@@ -258,32 +259,38 @@ bool CEGLNativeTypeAndroid::GetNativeResolution(RESOLUTION_INFO *res) const
   if (!*nativeWindow)
     return false;
 
-  if (s_hasModeApi)
-  {
-    *res = s_res_cur_displayMode;
-    return true;
-  }
-
+  int defWidth = 0, defHeight = 0;
   if (!m_width || !m_height)
   {
     ANativeWindow_acquire(*nativeWindow);
-    res->iWidth = ANativeWindow_getWidth(*nativeWindow);
-    res->iHeight= ANativeWindow_getHeight(*nativeWindow);
+    defWidth = ANativeWindow_getWidth(*nativeWindow);
+    defHeight= ANativeWindow_getHeight(*nativeWindow);
     ANativeWindow_release(*nativeWindow);
   }
   else
   {
-    res->iWidth = m_width;
-    res->iHeight = m_height;
+    defWidth = m_width;
+    defHeight = m_height;
   }
 
-  res->strId = "-1";
-  res->fRefreshRate = currentRefreshRate();
-  res->dwFlags= D3DPRESENTFLAG_PROGRESSIVE;
-  res->iScreen       = 0;
-  res->bFullScreen   = true;
+  if (s_hasModeApi)
+  {
+    *res = s_res_cur_displayMode;
+    res->iWidth = defWidth;
+    res->iHeight = defHeight;
+  }
+  else
+  {
+    res->strId = "-1";
+    res->fRefreshRate = currentRefreshRate();
+    res->dwFlags= D3DPRESENTFLAG_PROGRESSIVE;
+    res->iScreen       = 0;
+    res->bFullScreen   = true;
+    res->iWidth = defWidth;
+    res->iHeight = defHeight;
+    res->fPixelRatio   = 1.0f;
+  }
   res->iSubtitles    = (int)(0.965 * res->iHeight);
-  res->fPixelRatio   = 1.0f;
   res->iScreenWidth  = res->iWidth;
   res->iScreenHeight = res->iHeight;
   res->strMode       = StringUtils::Format("%dx%d @ %.6f%s - Full Screen", res->iScreenWidth, res->iScreenHeight, res->fRefreshRate,
@@ -297,14 +304,17 @@ bool CEGLNativeTypeAndroid::SetNativeResolution(const RESOLUTION_INFO &res)
   CLog::Log(LOGDEBUG, "CEGLNativeTypeAndroid: SetNativeResolution: %s: %dx%d@%f", res.strId.c_str(), res.iWidth, res.iHeight, res.fRefreshRate);
 
 
-  if (s_hasModeApi)
+  if (s_hasModeApi && res.strId != s_res_cur_displayMode.strId)
   {
     CXBMCApp::SetDisplayMode(atoi(res.strId.c_str()));
     s_res_cur_displayMode = res;
   }
   else if (abs(currentRefreshRate() - res.fRefreshRate) > 0.0001)
     CXBMCApp::SetRefreshRate(res.fRefreshRate);
-  CXBMCApp::SetBuffersGeometry(res.iWidth, res.iHeight, 0);
+
+  EGLNativeWindowType *nativeWindow = (EGLNativeWindowType*)CXBMCApp::GetNativeWindow(30000);
+  if (nativeWindow)
+    CXBMCApp::SetBuffersGeometry(res.iWidth, res.iHeight);
 
   return true;
 }
@@ -313,7 +323,17 @@ bool CEGLNativeTypeAndroid::ProbeResolutions(std::vector<RESOLUTION_INFO> &resol
 {
   if (s_hasModeApi)
   {
-    resolutions.insert(resolutions.end(), s_res_displayModes.begin(), s_res_displayModes.end());
+    for(RESOLUTION_INFO res : s_res_displayModes)
+    {
+      if (m_width && m_height)
+      {
+        res.iWidth = std::min(res.iWidth, m_width);
+        res.iHeight = std::min(res.iHeight, m_height);
+        res.iScreenWidth = res.iWidth;
+        res.iScreenHeight = res.iHeight;
+      }
+      resolutions.push_back(res);
+    }
     return true;
   }
 
@@ -367,4 +387,9 @@ bool CEGLNativeTypeAndroid::GetPreferredResolution(RESOLUTION_INFO *res) const
 bool CEGLNativeTypeAndroid::ShowWindow(bool show)
 {
   return false;
+}
+
+bool CEGLNativeTypeAndroid::BringToFront()
+{
+  CXBMCApp::BringToFront();
 }

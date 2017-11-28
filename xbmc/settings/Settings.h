@@ -95,6 +95,7 @@ public:
   static const std::string SETTING_VIDEOLIBRARY_GROUPSINGLEITEMSETS;
   static const std::string SETTING_VIDEOLIBRARY_UPDATEONSTARTUP;
   static const std::string SETTING_VIDEOLIBRARY_BACKGROUNDUPDATE;
+  static const std::string SETTING_VIDEOLIBRARY_IMPORTALL;
   static const std::string SETTING_VIDEOLIBRARY_CLEANUP;
   static const std::string SETTING_VIDEOLIBRARY_EXPORT;
   static const std::string SETTING_VIDEOLIBRARY_IMPORT;
@@ -115,9 +116,6 @@ public:
   static const std::string SETTING_VIDEOPLAYER_RENDERMETHOD;
   static const std::string SETTING_VIDEOPLAYER_HQSCALERS;
   static const std::string SETTING_VIDEOPLAYER_USEAMCODEC;
-  static const std::string SETTING_VIDEOPLAYER_USEAMCODECMPEG2;
-  static const std::string SETTING_VIDEOPLAYER_USEAMCODECMPEG4;
-  static const std::string SETTING_VIDEOPLAYER_USEAMCODECH264;
   static const std::string SETTING_VIDEOPLAYER_USEMEDIACODEC;
   static const std::string SETTING_VIDEOPLAYER_USEMEDIACODECSURFACE;
   static const std::string SETTING_VIDEOPLAYER_USEVDPAU;
@@ -136,6 +134,10 @@ public:
   static const std::string SETTING_VIDEOPLAYER_USEVTB;
   static const std::string SETTING_VIDEOPLAYER_USEMMAL;
   static const std::string SETTING_VIDEOPLAYER_USESTAGEFRIGHT;
+  static const std::string SETTING_VIDEOPLAYER_ACCELMPEG2;
+  static const std::string SETTING_VIDEOPLAYER_ACCELMPEG4;
+  static const std::string SETTING_VIDEOPLAYER_ACCELH264;
+  static const std::string SETTING_VIDEOPLAYER_ACCELHEVC;
   static const std::string SETTING_VIDEOPLAYER_LIMITGUIUPDATE;
   static const std::string SETTING_VIDEOPLAYER_SUPPORTMVC;
   static const std::string SETTING_MYVIDEOS_SELECTACTION;
@@ -265,6 +267,7 @@ public:
   static const std::string SETTING_WEATHER_ADDON;
   static const std::string SETTING_WEATHER_ADDONSETTINGS;
   static const std::string SETTING_SERVICES_DEVICENAME;
+  static const std::string SETTING_SERVICES_UPNP;
   static const std::string SETTING_SERVICES_UPNPSERVER;
   static const std::string SETTING_SERVICES_UPNPANNOUNCE;
   static const std::string SETTING_SERVICES_UPNPLOOKFOREXTERNALSUBTITLES;
@@ -354,6 +357,7 @@ public:
   static const std::string SETTING_DEBUG_EXTRALOGGING;
   static const std::string SETTING_DEBUG_SETEXTRALOGLEVEL;
   static const std::string SETTING_DEBUG_SCREENSHOTPATH;
+  static const std::string SETTING_DEBUG_UPLOADLOG;
   static const std::string SETTING_EVENTLOG_ENABLED;
   static const std::string SETTING_EVENTLOG_ENABLED_NOTIFICATIONS;
   static const std::string SETTING_EVENTLOG_SHOW;
@@ -381,6 +385,15 @@ public:
   static const std::string SETTING_SOURCE_VIDEOS;
   static const std::string SETTING_SOURCE_MUSIC;
   static const std::string SETTING_SOURCE_PICTURES;
+  static const std::string SETTING_THUMBNAILS_CLEANUP;
+
+  static const std::string SETTING_MYSQL_ENABLED;
+  static const std::string SETTING_MYSQL_HOST;
+  static const std::string SETTING_MYSQL_PORT;
+  static const std::string SETTING_MYSQL_USER;
+  static const std::string SETTING_MYSQL_PASS;
+  static const std::string SETTING_MYSQL_VIDEO;
+  static const std::string SETTING_MYSQL_MUSIC;
 
   /*!
    \brief Creates a new settings wrapper around a new settings manager.
@@ -592,6 +605,16 @@ public:
    \return True if the setting was successfully loaded from the given XML node, false otherwise
    */
   bool LoadSetting(const TiXmlNode *node, const std::string &settingId);
+
+  /*!
+   \brief Check the existence of a condition.
+
+   \param id Condition identifier
+   \return True if the condition has been defined
+   */
+  bool HasCondition(const std::string &id);
+
+  static std::vector<CVariant> ListToValues(const CSettingList *setting, const std::vector< std::shared_ptr<CSetting> > &values);
 private:
   CSettings(const CSettings&);
   CSettings const& operator=(CSettings const&);

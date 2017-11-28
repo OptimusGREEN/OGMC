@@ -16,24 +16,43 @@ endif()
 # Configure files into packaging environment.
 configure_file(${CORE_SOURCE_DIR}/tools/android/packaging/Makefile.in
                ${CMAKE_BINARY_DIR}/tools/android/packaging/Makefile @ONLY)
-configure_file(${CORE_SOURCE_DIR}/tools/android/packaging/apksign
-               ${CMAKE_BINARY_DIR}/tools/android/packaging/apksign COPYONLY)
-configure_file(${CORE_SOURCE_DIR}/tools/android/packaging/make_symbols.sh
-               ${CMAKE_BINARY_DIR}/tools/android/packaging/make_symbols.sh COPYONLY)
+file(COPY ${CORE_SOURCE_DIR}/tools/android/packaging/apksign         DESTINATION ${CMAKE_BINARY_DIR}/tools/android/packaging/)
+file(COPY ${CORE_SOURCE_DIR}/tools/android/packaging/make_symbols.sh DESTINATION ${CMAKE_BINARY_DIR}/tools/android/packaging/)
+file(COPY ${CORE_SOURCE_DIR}/tools/android/packaging/build.gradle    DESTINATION ${CMAKE_BINARY_DIR}/tools/android/packaging/)
+file(COPY ${CORE_SOURCE_DIR}/tools/android/packaging/gradlew         DESTINATION ${CMAKE_BINARY_DIR}/tools/android/packaging/)
+file(COPY ${CORE_SOURCE_DIR}/tools/android/packaging/settings.gradle DESTINATION ${CMAKE_BINARY_DIR}/tools/android/packaging/)
+file(COPY ${CORE_SOURCE_DIR}/tools/android/packaging/gradle DESTINATION ${CMAKE_BINARY_DIR}/tools/android/packaging/)
 file(WRITE ${CMAKE_BINARY_DIR}/tools/depends/Makefile.include
      "$(PREFIX)/lib/${APP_NAME_LC}/lib${APP_NAME_LC}.so: ;\n")
 
 set(package_files strings.xml
                   activity_main.xml
+                  colors.xml
+                  searchable.xml
                   AndroidManifest.xml
-                  src/org/xbmc/kodi/XBMCOnAudioFocusChangeListener.java
-                  src/org/xbmc/kodi/XBMCInputDeviceListener.java
-                  src/org/xbmc/kodi/Main.java
-                  src/org/xbmc/kodi/XBMCSettingsContentObserver.java
-                  src/org/xbmc/kodi/XBMCOnFrameAvailableListener.java
-                  src/org/xbmc/kodi/XBMCVideoView.java
-                  src/org/xbmc/kodi/Splash.java
-                  src/org/xbmc/kodi/XBMCBroadcastReceiver.java)
+                  build.gradle
+                  src/Main.java
+                  src/Splash.java
+                  src/XBMCBroadcastReceiver.java
+                  src/XBMCCrashHandler.java
+                  src/XBMCImageContentProvider.java
+                  src/XBMCInputDeviceListener.java
+                  src/XBMCJsonRPC.java
+                  src/XBMCMainView.java
+                  src/XBMCMediaContentProvider.java
+                  src/XBMCMediaSession.java
+                  src/XBMCProjection.java
+                  src/XBMCRecommendationBuilder.java
+                  src/XBMCSearchableActivity.java
+                  src/XBMCSettingsContentObserver.java
+                  src/XBMCProperties.java
+                  src/XBMCVideoView.java
+                  src/interfaces/XBMCAudioManagerOnAudioFocusChangeListener.java
+                  src/interfaces/XBMCSurfaceTextureOnFrameAvailableListener.java
+                  src/interfaces/XBMCNsdManagerDiscoveryListener.java
+                  src/interfaces/XBMCNsdManagerRegistrationListener.java
+                  src/interfaces/XBMCNsdManagerResolveListener.java
+                  )
 foreach(file IN LISTS package_files)
   configure_file(${CORE_SOURCE_DIR}/tools/android/packaging/xbmc/${file}.in
                  ${CMAKE_BINARY_DIR}/tools/android/packaging/xbmc/${file} @ONLY)
@@ -106,6 +125,7 @@ foreach(target apk obb apk-unsigned apk-obb apk-obb-unsigned apk-noobb apk-clean
               CPU=${CPU}
               ARCH=${ARCH}
               PREFIX=${prefix}
+              DEPENDS_PATH=${DEPENDS_PATH}
               NDKROOT=${NDKROOT}
               SDKROOT=${SDKROOT}
               SDK_PLATFORM=${SDK_PLATFORM}

@@ -677,7 +677,8 @@ int CVideoDatabase::RunQuery(const std::string &sql)
     if (rows == 0)
       m_pDS->close();
   }
-  CLog::Log(LOGDEBUG, "%s took %d ms for %d items query: %s", __FUNCTION__, XbmcThreads::SystemClockMillis() - time, rows, sql.c_str());
+  if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+    CLog::Log(LOGDEBUG, "%s took %d ms for %d items query: %s", __FUNCTION__, XbmcThreads::SystemClockMillis() - time, rows, sql.c_str());
   return rows;
 }
 
@@ -1125,7 +1126,8 @@ int CVideoDatabase::GetMovieId(const std::string& strFilenameAndPath)
     else
       strSQL=PrepareSQL("select idMovie from movie where idFile=%i", idFile);
 
-    CLog::Log(LOGDEBUG, "%s (%s), query = %s", __FUNCTION__, CURL::GetRedacted(strFilenameAndPath).c_str(), strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s (%s), query = %s", __FUNCTION__, CURL::GetRedacted(strFilenameAndPath).c_str(), strSQL.c_str());
     m_pDS->query(strSQL);
     if (m_pDS->num_rows() > 0)
       idMovie = m_pDS->fv("idMovie").get_asInt();
@@ -1207,7 +1209,8 @@ int CVideoDatabase::GetEpisodeId(const std::string& strFilenameAndPath, int idEp
 
     std::string strSQL=PrepareSQL("select idEpisode from episode where idFile=%i", idFile);
 
-    CLog::Log(LOGDEBUG, "%s (%s), query = %s", __FUNCTION__, CURL::GetRedacted(strFilenameAndPath).c_str(), strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s (%s), query = %s", __FUNCTION__, CURL::GetRedacted(strFilenameAndPath).c_str(), strSQL.c_str());
     pDS->query(strSQL);
     if (pDS->num_rows() > 0)
     {
@@ -1258,7 +1261,8 @@ int CVideoDatabase::GetMusicVideoId(const std::string& strFilenameAndPath)
 
     std::string strSQL=PrepareSQL("select idMVideo from musicvideo where idFile=%i", idFile);
 
-    CLog::Log(LOGDEBUG, "%s (%s), query = %s", __FUNCTION__, CURL::GetRedacted(strFilenameAndPath).c_str(), strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s (%s), query = %s", __FUNCTION__, CURL::GetRedacted(strFilenameAndPath).c_str(), strSQL.c_str());
     m_pDS->query(strSQL);
     int idMVideo=-1;
     if (m_pDS->num_rows() > 0)
@@ -2361,7 +2365,7 @@ int CVideoDatabase::UpdateDetailsForMovie(int idMovie, CVideoInfoTag& details, c
 
   try
   {
-    CLog::Log(LOGDEBUG, "%s: Starting updates for movie %i", __FUNCTION__, idMovie);
+    CLog::Log(LOGINFO, "%s: Starting updates for movie %i", __FUNCTION__, idMovie);
 
     BeginTransaction();
 
@@ -2446,7 +2450,7 @@ int CVideoDatabase::UpdateDetailsForMovie(int idMovie, CVideoInfoTag& details, c
 
     CommitTransaction();
 
-    CLog::Log(LOGDEBUG, "%s: Finished updates for movie %i", __FUNCTION__, idMovie);
+    CLog::Log(LOGINFO, "%s: Finished updates for movie %i", __FUNCTION__, idMovie);
 
     return idMovie;
   }
@@ -2709,7 +2713,7 @@ int CVideoDatabase::SetDetailsForEpisode(const std::string& strFilenameAndPath, 
 
     SetArtForItem(idEpisode, MediaTypeEpisode, artwork);
 
-    if (details.m_iEpisode != -1 && details.m_iSeason != -1)
+    if (!(details.m_iSeason == 0 && details.m_iEpisode == 0)) // Special episodes
     { // query DB for any episodes matching idShow, Season and Episode
       std::string strSQL = PrepareSQL("SELECT files.playCount, files.lastPlayed "
                                       "FROM episode INNER JOIN files ON files.idFile=episode.idFile "
@@ -3601,6 +3605,32 @@ void CVideoDatabase::GetDetailsFromDB(const dbiplus::sql_record* const record, i
 
 DWORD movieTime = 0;
 DWORD castTime = 0;
+
+CVideoInfoTag CVideoDatabase::GetDetailsByTypeAndId(VIDEODB_CONTENT_TYPE type, int id)
+{
+  CVideoInfoTag details;
+  details.Reset();
+
+  switch (type)
+  {
+    case VIDEODB_CONTENT_MOVIES:
+      GetMovieInfo("", details, id);
+      break;
+    case VIDEODB_CONTENT_TVSHOWS:
+      GetTvShowInfo("", details, id);
+      break;
+    case VIDEODB_CONTENT_EPISODES:
+      GetEpisodeInfo("", details, id);
+      break;
+    case VIDEODB_CONTENT_MUSICVIDEOS:
+      GetMusicVideoInfo("", details, id);
+      break;
+    default:
+      break;
+  }
+
+  return details;
+}
 
 bool CVideoDatabase::GetStreamDetails(CFileItem& item)
 {
@@ -6008,7 +6038,8 @@ bool CVideoDatabase::GetPeopleNav(const std::string& strBaseDir, CFileItemList& 
     // run query
     unsigned int time = XbmcThreads::SystemClockMillis();
     if (!m_pDS->query(strSQL)) return false;
-    CLog::Log(LOGDEBUG, "%s -  query took %i ms",
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s -  query took %i ms",
               __FUNCTION__, XbmcThreads::SystemClockMillis() - time); time = XbmcThreads::SystemClockMillis();
     int iRowsFound = m_pDS->num_rows();
     if (iRowsFound == 0)
@@ -6113,7 +6144,8 @@ bool CVideoDatabase::GetPeopleNav(const std::string& strBaseDir, CFileItemList& 
       }
       m_pDS->close();
     }
-    CLog::Log(LOGDEBUG, "%s item retrieval took %i ms",
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s item retrieval took %i ms",
               __FUNCTION__, XbmcThreads::SystemClockMillis() - time); time = XbmcThreads::SystemClockMillis();
 
     return true;
@@ -7816,7 +7848,8 @@ bool CVideoDatabase::GetRandomMusicVideo(CFileItem* item, int& idSong, const std
     if (!strWhere.empty())
       strSQL += " where " + strWhere;
     strSQL += PrepareSQL(" order by RANDOM() limit 1");
-    CLog::Log(LOGDEBUG, "%s query = %s", __FUNCTION__, strSQL.c_str());
+    if (g_advancedSettings.CanLogComponent(LOGDATABASE))
+      CLog::Log(LOGDEBUG, "%s query = %s", __FUNCTION__, strSQL.c_str());
     // run query
     if (!m_pDS->query(strSQL))
       return false;
@@ -8738,6 +8771,103 @@ void CVideoDatabase::DumpToDummyFiles(const std::string &path)
   }
 }
 
+void CVideoDatabase::ExportSingleVideoToXML(const std::string& inPath, bool images /*=false*/, bool overwrite/*=false*/, const std::string &outPath /*=""*/)
+{
+  if (!URIUtils::IsVideoDb(inPath))
+    return;
+
+  std::string strFileName=URIUtils::GetFileName(inPath);
+  if (strFileName.empty())
+	  return;
+
+  std::string strPath = URIUtils::GetDirectory(inPath);
+  if (strPath.empty())
+	  return;
+
+  std::string strExtension = URIUtils::GetExtension(strFileName);
+  URIUtils::RemoveExtension(strFileName);
+
+  if (!StringUtils::IsNaturalNumber(strFileName))
+    return;
+  long idDb=atol(strFileName.c_str());
+
+  std::vector<std::string> pathElem = StringUtils::Split(strPath, "/");
+  if (pathElem.size() == 0)
+    return;
+
+  std::string itemType = pathElem.at(2);
+  VIDEODB_CONTENT_TYPE type;
+  if (itemType == "movies" || itemType == "recentlyaddedmovies")
+    type = VIDEODB_CONTENT_MOVIES;
+  else if (itemType == "episodes" || itemType == "recentlyaddedepisodes")
+    type = VIDEODB_CONTENT_EPISODES;
+  else if (itemType == "musicvideos" || itemType == "recentlyaddedmusicvideos")
+    type = VIDEODB_CONTENT_MUSICVIDEOS;
+  else
+    return;
+
+  CVideoInfoTag tag = GetDetailsByTypeAndId(type, idDb);
+
+  // create our xml document
+  CXBMCTinyXML xmlDoc;
+  TiXmlDeclaration decl("1.0", "UTF-8", "yes");
+  xmlDoc.InsertEndChild(decl);
+
+  std::map<std::string, std::string> artwork;
+  GetArtForItem(tag.m_iDbId, tag.m_type, artwork);
+  switch (type)
+  {
+  case VIDEODB_CONTENT_MOVIES:
+    tag.Save(&xmlDoc, "movie", false);
+    break;
+  case VIDEODB_CONTENT_EPISODES:
+    tag.Save(&xmlDoc, "episodedetails", false);
+    break;
+  case VIDEODB_CONTENT_MUSICVIDEOS:
+    tag.Save(&xmlDoc, "musicvideo", false);
+    break;
+  }
+
+  std::string outDir;
+  std::string outNfo;
+  if (!outPath.empty())
+  {
+    outDir = URIUtils::GetParentPath(outPath);
+    outNfo = URIUtils::GetFileName(URIUtils::ReplaceExtension(outPath, ".nfo"));
+  } 
+  else
+  {
+    outDir = URIUtils::GetParentPath(tag.m_strFileNameAndPath);
+    outNfo = URIUtils::GetFileName(URIUtils::ReplaceExtension(tag.m_strFileNameAndPath, ".nfo"));
+  }
+  if (CUtil::SupportsWriteFileOperations(outDir))
+  {
+    std::string nfoFile(URIUtils::AddFileToFolder(outDir, outNfo));
+    if (overwrite || !CFile::Exists(nfoFile, false))
+    {
+      if(!xmlDoc.SaveFile(nfoFile))
+      {
+        CLog::Log(LOGERROR, "%s: Movie nfo export failed! ('%s')", __FUNCTION__, nfoFile.c_str());
+        return;
+      }
+
+      xmlDoc.Clear();
+    }
+
+    if (images)
+    {
+      CFileItem item(tag.m_strFileNameAndPath,false);
+      item.SetArt(artwork);
+      for (std::map<std::string, std::string>::const_iterator i = artwork.begin(); i != artwork.end(); ++i)
+      {
+        std::string savedThumb = item.GetLocalArt(i->first, false);
+        savedThumb = URIUtils::AddFileToFolder(outDir, URIUtils::GetFileName(savedThumb));
+        CTextureCache::GetInstance().Export(i->second, savedThumb, overwrite);
+      }
+    }
+  }
+}
+
 void CVideoDatabase::ExportToXML(const std::string &path, bool singleFile /* = true */, bool images /* = false */, bool actorThumbs /* false */, bool overwrite /*=false*/)
 {
   int iFailCount = 0;
@@ -8849,7 +8979,7 @@ void CVideoDatabase::ExportToXML(const std::string &path, bool singleFile /* = t
       {
         if (!item.Exists(false))
         {
-          CLog::Log(LOGDEBUG, "%s - Not exporting item %s as it does not exist", __FUNCTION__, movie.m_strFileNameAndPath.c_str());
+          CLog::Log(LOGINFO, "%s - Not exporting item %s as it does not exist", __FUNCTION__, movie.m_strFileNameAndPath.c_str());
           bSkip = true;
         }
         else
@@ -8946,7 +9076,7 @@ void CVideoDatabase::ExportToXML(const std::string &path, bool singleFile /* = t
       {
         if (!item.Exists(false))
         {
-          CLog::Log(LOGDEBUG, "%s - Not exporting item %s as it does not exist", __FUNCTION__, movie.m_strFileNameAndPath.c_str());
+          CLog::Log(LOGINFO, "%s - Not exporting item %s as it does not exist", __FUNCTION__, movie.m_strFileNameAndPath.c_str());
           bSkip = true;
         }
         else
@@ -9044,7 +9174,7 @@ void CVideoDatabase::ExportToXML(const std::string &path, bool singleFile /* = t
       {
         if (!item.Exists(false))
         {
-          CLog::Log(LOGDEBUG, "%s - Not exporting item %s as it does not exist", __FUNCTION__, tvshow.m_strPath.c_str());
+          CLog::Log(LOGINFO, "%s - Not exporting item %s as it does not exist", __FUNCTION__, tvshow.m_strPath.c_str());
           bSkip = true;
         }
         else
@@ -9139,7 +9269,7 @@ void CVideoDatabase::ExportToXML(const std::string &path, bool singleFile /* = t
         {
           if (!item.Exists(false))
           {
-            CLog::Log(LOGDEBUG, "%s - Not exporting item %s as it does not exist", __FUNCTION__, episode.m_strFileNameAndPath.c_str());
+            CLog::Log(LOGINFO, "%s - Not exporting item %s as it does not exist", __FUNCTION__, episode.m_strFileNameAndPath.c_str());
             bSkip = true;
           }
           else
@@ -9295,7 +9425,7 @@ void CVideoDatabase::ImportFromXML(const std::string &path)
     int iVersion = 0;
     XMLUtils::GetInt(root, "version", iVersion);
 
-    CLog::Log(LOGDEBUG, "%s: Starting import (export version = %i)", __FUNCTION__, iVersion);
+    CLog::Log(LOGINFO, "%s: Starting import (export version = %i)", __FUNCTION__, iVersion);
 
     TiXmlElement *movie = root->FirstChildElement();
     int current = 0;
