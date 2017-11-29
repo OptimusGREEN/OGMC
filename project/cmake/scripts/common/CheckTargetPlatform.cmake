@@ -9,9 +9,9 @@ function(check_target_platform dir target_platform build)
   if(EXISTS ${dir} AND EXISTS ${dir}/platforms.txt)
     # get all the specified platforms
     file(STRINGS ${dir}/platforms.txt platforms)
-    
+
     list( LENGTH platforms listlen )
-    if(${listlen} EQUAL 1)    
+    if(${listlen} EQUAL 1)
         string(REPLACE " " ";" platforms ${platforms})
     endif()
 
@@ -47,8 +47,8 @@ function(check_install_permissions install_dir have_perms)
   # param[in] install_dir directory to check for write permissions
   # param[out] have_perms wether we have permissions to install to install_dir
 
-  set(testfile_lib ${install_dir}/lib/kodi/.cmake-inst-test)
-  set(testfile_share ${install_dir}/share/kodi/.cmake-inst-test)
+  set(testfile_lib ${install_dir}/lib/ogmc/.cmake-inst-test)
+  set(testfile_share ${install_dir}/share/ogmc/.cmake-inst-test)
   get_filename_component(testdir_lib ${testfile_lib} DIRECTORY)
   get_filename_component(testdir_share ${testfile_share} DIRECTORY)
 

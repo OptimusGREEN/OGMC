@@ -7,19 +7,19 @@ if(NOT DEFINED KODI_MIRROR)
   set(KODI_MIRROR "http://mirrors.kodi.tv")
 endif()
 
-### copy all the addon binding header files to include/kodi
-# make sure include/kodi exists and is empty
-set(APP_LIB_DIR ${ADDON_DEPENDS_PATH}/lib/${APP_NAME_LC})
+### copy all the addon binding header files to include/ogmc
+# make sure include/ogmc exists and is empty
+set(APP_LIB_DIR ${ADDON_DEPENDS_PATH}/lib/ogmc)
 if(NOT EXISTS "${APP_LIB_DIR}/")
   file(MAKE_DIRECTORY ${APP_LIB_DIR})
 endif()
 
-set(APP_DATA_DIR ${ADDON_DEPENDS_PATH}/share/${APP_NAME_LC})
+set(APP_DATA_DIR ${ADDON_DEPENDS_PATH}/share/ogmc)
 if(NOT EXISTS "${APP_DATA_DIR}/")
   file(MAKE_DIRECTORY ${APP_DATA_DIR})
 endif()
 
-set(APP_INCLUDE_DIR ${ADDON_DEPENDS_PATH}/include/${APP_NAME_LC})
+set(APP_INCLUDE_DIR ${ADDON_DEPENDS_PATH}/include/ogmc)
 if(NOT EXISTS "${APP_INCLUDE_DIR}/")
   file(MAKE_DIRECTORY ${APP_INCLUDE_DIR})
 endif()
@@ -35,12 +35,12 @@ endif()
 # generate the proper KodiConfig.cmake file
 configure_file(${CORE_SOURCE_DIR}/project/cmake/KodiConfig.cmake.in ${APP_LIB_DIR}/KodiConfig.cmake @ONLY)
 
-# copy cmake helpers to lib/kodi
+# copy cmake helpers to lib/ogmc
 file(COPY ${CORE_SOURCE_DIR}/project/cmake/scripts/common/AddonHelpers.cmake
           ${CORE_SOURCE_DIR}/project/cmake/scripts/common/AddOptions.cmake
      DESTINATION ${APP_LIB_DIR})
 
-### copy all the addon binding header files to include/kodi
+### copy all the addon binding header files to include/ogmc
 # parse addon-bindings.mk to get the list of header files to copy
 core_file_read_filtered(bindings ${CORE_SOURCE_DIR}/xbmc/addons/addon-bindings.mk)
 foreach(binding ${bindings})
