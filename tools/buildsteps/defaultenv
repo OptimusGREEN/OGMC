@@ -56,7 +56,7 @@ fi
 if [ "$NDK_VERSION" == "Default" ]
 then
   NDK_VERSION=$DEFAULT_NDK_VERSION
-fi
+fi 
 
 if [ "$XBMC_DEPENDS_ROOT" == "Default" ]
 then
@@ -65,7 +65,7 @@ fi
 
 if [ "$DARWIN_ARM_CPU" == "Default" ]
 then
-  DARWIN_ARM_CPU=$DEFAULT_DARWIN_ARM_CPU
+  DARWIN_ARM_CPU=$DEFAULT_DARWIN_ARM_CPU  
 fi
 
 if [ "$Configuration" == "Default" ]
@@ -115,7 +115,7 @@ function pathChanged ()
   else
     ret="1"
   fi
-
+  
   echo $ret
 }
 
@@ -183,9 +183,4 @@ function getBuildRevDateStr ()
   else
     echo "Unknown"
   fi
-}
-
-function getAppName ()
-{
-  echo `awk '/APP_NAME/ {print $2}' $WORKSPACE/version.txt`
 }

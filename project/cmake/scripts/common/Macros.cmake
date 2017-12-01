@@ -1,12 +1,7 @@
 # This script holds the main functions used to construct the build system
 
-# Include system specific macros but only if this file is included from
-# kodi main project. It's not needed for kodi-addons project
-# If CORE_SOURCE_DIR is set, it was called from kodi-addons project
-# TODO: drop check if we ever integrate kodi-addons into kodi project
-if(NOT CORE_SOURCE_DIR)
-  include(${CMAKE_SOURCE_DIR}/cmake/scripts/${CORE_SYSTEM_NAME}/Macros.cmake)
-endif()
+# include system specific macros
+include(${CORE_SOURCE_DIR}/project/cmake/scripts/${CORE_SYSTEM_NAME}/Macros.cmake)
 
 # IDEs: Group source files in target in folders (file system hierarchy)
 # Source: http://blog.audio-tk.com/2015/09/01/sorting-source-files-and-projects-in-folders-with-cmake-and-visual-studioxcode/
@@ -56,6 +51,53 @@ function(source_group_by_folder target)
   endif()
 endfunction()
 
+# Marks header file as being overridden on a certain list of platforms.
+#
+# Explicitly marking a file as overridden on specific platforms avoids issues with globbing where
+# CMake would have to be called manually when overriding for a new platform.
+#
+# Usage: add_platform_override(${PROJECT_NAME} settings.h PLATFORMS android linux osx)
+function(add_platform_override target filename)
+  cmake_parse_arguments(ARG "" "" "PLATFORMS" ${ARGN})
+  if(NOT ARG_PLATFORMS)
+    message(FATAL_ERROR "Missing parameter PLATFORMS")
+  endif()
+
+  # Generate an _override.h header that is either empty (platform doesn't define overrides)
+  # or includes the corresponding platform override header.
+  # This _override.h has to be included by the generic header.
+
+  # Determine filename of override header.
+  string(REPLACE ".h" "_override.h" override_file ${filename})
+
+  # Check if we have an override defined for this platform.
+  # TODO: Replace by if(IN_LIST) once we bump to CMake 3.3
+  if(";${ARG_PLATFORMS};" MATCHES ";${CORE_SYSTEM_NAME};")
+    message(STATUS "Override active for ${filename} on ${CORE_SYSTEM_NAME}")
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${override_file} "#include \"overrides/${CORE_SYSTEM_NAME}/${filename}\"")
+
+    # Add platform specific header to target sources (for IDEs)
+    target_sources(${target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/overrides/${CORE_SYSTEM_NAME}/${filename})
+  else()
+    # Issue an error if a file exists but it's not listed in add_platform_override.
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/overrides/${CORE_SYSTEM_NAME}/${filename})
+      message(FATAL_ERROR "Disabled platform override file detected, add it to the 'add_platform_override' call.")
+    endif()
+
+    message(STATUS "Override disabled for ${filename}, using generic implementation")
+    string(CONCAT COMMENT "// No platform override defined for ${CORE_SYSTEM_NAME}. To add overrides:\n"
+                          "// Create '${CMAKE_CURRENT_SOURCE_DIR}/overrides/${CORE_SYSTEM_NAME}/${filename}' and redefine symbols from '${filename}'.\n"
+                          "// Then adapt '${CMAKE_CURRENT_LIST_FILE}' and add '${CORE_SYSTEM_NAME}' to the 'add_platform_override' call.")
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${override_file} ${COMMENT})
+  endif()
+
+  # Add generated file to target sources (for IDEs)
+  target_sources(${target} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${override_file})
+
+  # TODO: If we want to allow the usage of the header in others headers, change to PUBLIC
+  target_include_directories(${target} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+endfunction()
+
 # Add sources to main application
 # Arguments:
 #   name name of the library to add
@@ -77,7 +119,7 @@ function(core_add_library name)
 
     # Add precompiled headers to Kodi main libraries
     if(CORE_SYSTEM_NAME STREQUAL windows)
-      add_precompiled_header(${name} pch.h ${CMAKE_SOURCE_DIR}/xbmc/platform/win32/pch.cpp PCH_TARGET kodi)
+      add_precompiled_header(${name} pch.h ${CORE_SOURCE_DIR}/xbmc/platform/win32/pch.cpp PCH_TARGET kodi)
       set_language_cxx(${name})
       target_link_libraries(${name} PUBLIC effects11)
     endif()
@@ -101,7 +143,7 @@ function(core_add_test_library name)
     add_dependencies(${name} libcpluff ffmpeg dvdnav crossguid)
     set(test_archives ${test_archives} ${name} CACHE STRING "" FORCE)
   endif()
-  foreach(src IN LISTS SOURCES SUPPORTED_SOURCES HEADERS OTHERS)
+  foreach(src IN LISTS SOURCES)
     get_filename_component(src_path "${src}" ABSOLUTE)
     set(test_sources "${src_path}" ${test_sources} CACHE STRING "" FORCE)
   endforeach()
@@ -123,8 +165,8 @@ function(core_add_addon_library name)
   set_target_properties(${name} PROPERTIES FOLDER addons)
   target_include_directories(${name} PRIVATE
                              ${CMAKE_CURRENT_SOURCE_DIR}
-                             ${CMAKE_SOURCE_DIR}/xbmc/addons/kodi-addon-dev-kit/include/kodi
-                             ${CMAKE_SOURCE_DIR}/xbmc)
+                             ${CORE_SOURCE_DIR}/xbmc/addons/kodi-addon-dev-kit/include/kodi
+                             ${CORE_SOURCE_DIR}/xbmc)
 endfunction()
 
 # Add an dl-loaded shared library
@@ -160,12 +202,9 @@ function(core_add_shared_library name)
     add_library(${name} SHARED ${SOURCES} ${HEADERS} ${OTHERS})
     set_target_properties(${name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT_DIRECTORY}
                                              RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT_DIRECTORY}
+                                             RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/${OUTPUT_DIRECTORY}
+                                             RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/${OUTPUT_DIRECTORY}
                                              OUTPUT_NAME ${OUTPUT_NAME} PREFIX "")
-    foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
-      string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
-      set_target_properties(${name} PROPERTIES  LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/${OUTPUT_DIRECTORY}
-                                                RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/${OUTPUT_DIRECTORY})
-    endforeach()
 
     set(LIBRARY_FILES ${LIBRARY_FILES} ${CMAKE_BINARY_DIR}/${OUTPUT_DIRECTORY}/${OUTPUT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX} CACHE STRING "" FORCE)
     add_dependencies(${APP_NAME_LC}-libraries ${name})
@@ -196,7 +235,7 @@ endfunction()
 # Optional Arguments:
 #   NO_INSTALL: exclude file from installation target (only mirror)
 #   DIRECTORY:  directory where the file should be mirrored to
-#               (default: preserve tree structure relative to CMAKE_SOURCE_DIR)
+#               (default: preserve tree structure relative to CORE_SOURCE_DIR)
 # On return:
 #   Files is mirrored to the build tree and added to ${install_data}
 #   (if NO_INSTALL is not given).
@@ -207,7 +246,7 @@ function(copy_file_to_buildtree file)
     get_filename_component(outfile ${file} NAME)
     set(outfile ${outdir}/${outfile})
   else()
-    string(REPLACE "${CMAKE_SOURCE_DIR}/" "" outfile ${file})
+    string(REPLACE "${CORE_SOURCE_DIR}/" "" outfile ${file})
     get_filename_component(outdir ${outfile} DIRECTORY)
   endif()
 
@@ -248,7 +287,7 @@ endfunction()
 # Optional Arguments:
 #   NO_INSTALL: exclude files from installation target
 # Implicit arguments:
-#   CMAKE_SOURCE_DIR - root of source tree
+#   CORE_SOURCE_DIR - root of source tree
 # On return:
 #   Files are mirrored to the build tree and added to ${install_data}
 #   (if NO_INSTALL is not given).
@@ -278,17 +317,17 @@ function(copy_files_from_filelist_to_buildtree pattern)
 
         # If the full path to an existing file is specified then add that single file.
         # Don't recursively add all files with the given name.
-        if(EXISTS ${CMAKE_SOURCE_DIR}/${src} AND NOT IS_DIRECTORY ${CMAKE_SOURCE_DIR}/${src})
+        if(EXISTS ${CORE_SOURCE_DIR}/${src} AND NOT IS_DIRECTORY ${CORE_SOURCE_DIR}/${src})
           set(files ${src})
         else()
-          file(GLOB_RECURSE files RELATIVE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/${src})
+          file(GLOB_RECURSE files RELATIVE ${CORE_SOURCE_DIR} ${CORE_SOURCE_DIR}/${src})
         endif()
 
         foreach(file ${files})
           if(arg_NO_INSTALL)
-            copy_file_to_buildtree(${CMAKE_SOURCE_DIR}/${file} DIRECTORY ${dest} NO_INSTALL)
+            copy_file_to_buildtree(${CORE_SOURCE_DIR}/${file} DIRECTORY ${dest} NO_INSTALL)
           else()
-            copy_file_to_buildtree(${CMAKE_SOURCE_DIR}/${file} DIRECTORY ${dest})
+            copy_file_to_buildtree(${CORE_SOURCE_DIR}/${file} DIRECTORY ${dest})
           endif()
         endforeach()
       endforeach()
@@ -443,9 +482,9 @@ function(core_add_subdirs_from_filelist files)
       list(GET subdir  0 subdir_src)
       list(GET subdir -1 subdir_dest)
       if(VERBOSE)
-        message(STATUS "  core_add_subdirs_from_filelist - adding subdir: ${CMAKE_SOURCE_DIR}/${subdir_src} -> ${CORE_BUILD_DIR}/${subdir_dest}")
+        message(STATUS "  core_add_subdirs_from_filelist - adding subdir: ${CORE_SOURCE_DIR}/${subdir_src} -> ${CORE_BUILD_DIR}/${subdir_dest}")
       endif()
-      add_subdirectory(${CMAKE_SOURCE_DIR}/${subdir_src} ${CORE_BUILD_DIR}/${subdir_dest})
+      add_subdirectory(${CORE_SOURCE_DIR}/${subdir_src} ${CORE_BUILD_DIR}/${subdir_dest})
     endforeach()
   endforeach()
 endfunction()
@@ -482,9 +521,9 @@ macro(core_add_optional_subdirs_from_filelist pattern)
       foreach(opt ${opts})
         if(ENABLE_${opt})
           if(VERBOSE)
-            message(STATUS "  core_add_optional_subdirs_from_filelist - adding subdir: ${CMAKE_SOURCE_DIR}/${subdir_src} -> ${CORE_BUILD_DIR}/${subdir_dest}")
+            message(STATUS "  core_add_optional_subdirs_from_filelist - adding subdir: ${CORE_SOURCE_DIR}/${subdir_src} -> ${CORE_BUILD_DIR}/${subdir_dest}")
           endif()
-          add_subdirectory(${CMAKE_SOURCE_DIR}/${subdir_src} ${CORE_BUILD_DIR}/${subdir_dest})
+          add_subdirectory(${CORE_SOURCE_DIR}/${subdir_src} ${CORE_BUILD_DIR}/${subdir_dest})
         else()
           if(VERBOSE)
             message(STATUS "  core_add_optional_subdirs_from_filelist: OPTION ${opt} not enabled for ${subdir_src}, skipping subdir")
@@ -512,14 +551,14 @@ endfunction()
 #                        if no git tree is found, value is set to "nobody <nobody@example.com>"
 function(userstamp)
   find_package(Git)
-  if(GIT_FOUND AND EXISTS ${CMAKE_SOURCE_DIR}/.git)
+  if(GIT_FOUND AND EXISTS ${CORE_SOURCE_DIR}/.git)
     execute_process(COMMAND ${GIT_EXECUTABLE} config user.name
                     OUTPUT_VARIABLE username
-                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                    WORKING_DIRECTORY ${CORE_SOURCE_DIR}
                     OUTPUT_STRIP_TRAILING_WHITESPACE)
     execute_process(COMMAND ${GIT_EXECUTABLE} config user.email
                     OUTPUT_VARIABLE useremail
-                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                    WORKING_DIRECTORY ${CORE_SOURCE_DIR}
                     OUTPUT_STRIP_TRAILING_WHITESPACE)
     set(PACKAGE_MAINTAINER "${username} <${useremail}>" PARENT_SCOPE)
   else()
@@ -544,35 +583,39 @@ function(core_find_git_rev stamp)
     set(${stamp} ${GIT_VERSION} PARENT_SCOPE)
   else()
     find_package(Git)
-    if(GIT_FOUND AND EXISTS ${CMAKE_SOURCE_DIR}/.git)
+    if(GIT_FOUND AND EXISTS ${CORE_SOURCE_DIR}/.git)
       execute_process(COMMAND ${GIT_EXECUTABLE} update-index --ignore-submodules --refresh -q)
       execute_process(COMMAND ${GIT_EXECUTABLE} diff-files --ignore-submodules --quiet --
                       RESULT_VARIABLE status_code
-                      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+                      WORKING_DIRECTORY ${CORE_SOURCE_DIR})
         if(NOT status_code)
           execute_process(COMMAND ${GIT_EXECUTABLE} diff-index --ignore-submodules --quiet HEAD --
                         RESULT_VARIABLE status_code
-                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+                        WORKING_DIRECTORY ${CORE_SOURCE_DIR})
         endif()
         if(status_code)
           execute_process(COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"%h-dirty" HEAD
                           OUTPUT_VARIABLE HASH
-                          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+                          WORKING_DIRECTORY ${CORE_SOURCE_DIR})
           string(SUBSTRING ${HASH} 1 13 HASH)
         else()
           execute_process(COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"%h" HEAD
                           OUTPUT_VARIABLE HASH
-                          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+                          WORKING_DIRECTORY ${CORE_SOURCE_DIR})
           string(SUBSTRING ${HASH} 1 7 HASH)
         endif()
       execute_process(COMMAND ${GIT_EXECUTABLE} log -1 --pretty=format:"%cd" --date=short HEAD
                       OUTPUT_VARIABLE DATE
-                      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+                      WORKING_DIRECTORY ${CORE_SOURCE_DIR})
       string(SUBSTRING ${DATE} 1 10 DATE)
       string(REPLACE "-" "" DATE ${DATE})
     else()
       string(TIMESTAMP DATE "%Y%m%d" UTC)
-      set(HASH "nogitfound")
+      if(EXISTS ${CORE_SOURCE_DIR}/VERSION)
+        file(STRINGS ${CORE_SOURCE_DIR}/VERSION HASH LIMIT_INPUT 16)
+      else()
+        set(HASH "nogitfound")
+      endif()
     endif()
     cmake_parse_arguments(arg "FULL" "" "" ${ARGN})
     if(arg_FULL)
@@ -590,7 +633,6 @@ endfunction()
 #   APP_NAME - app name
 #   APP_NAME_LC - lowercased app name
 #   APP_NAME_UC - uppercased app name
-#   APP_PACKAGE - Android full package name
 #   COMPANY_NAME - company name
 #   APP_VERSION_MAJOR - the app version major
 #   APP_VERSION_MINOR - the app version minor
@@ -604,27 +646,16 @@ endfunction()
 #   guilib_version - current ADDONGUI API version
 #   guilib_version_min - minimal ADDONGUI API version
 macro(core_find_versions)
-  # kodi-addons project also calls this macro and uses CORE_SOURCE_DIR
-  # to point to core base dir
-  # Set CORE_SOURCE_DIR here, otherwise kodi main project fails
-  # TODO: drop this code block and refactor the rest to use CMAKE_SOURCE_DIR
-  # if we ever integrate kodi-addons into kodi project
-  if(NOT CORE_SOURCE_DIR)
-    set(CORE_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-  endif()
-
   include(CMakeParseArguments)
   core_file_read_filtered(version_list ${CORE_SOURCE_DIR}/version.txt)
   string(REPLACE " " ";" version_list "${version_list}")
-  cmake_parse_arguments(APP "" "APP_NAME;COMPANY_NAME;WEBSITE;VERSION_MAJOR;VERSION_MINOR;VERSION_TAG;VERSION_CODE;ADDON_API;APP_PACKAGE" "" ${version_list})
+  cmake_parse_arguments(APP "" "APP_NAME;COMPANY_NAME;WEBSITE;VERSION_MAJOR;VERSION_MINOR;VERSION_TAG;VERSION_CODE;ADDON_API" "" ${version_list})
 
   set(APP_NAME ${APP_APP_NAME}) # inconsistency but APP_APP_NAME looks weird
   string(TOLOWER ${APP_APP_NAME} APP_NAME_LC)
   string(TOUPPER ${APP_APP_NAME} APP_NAME_UC)
   set(COMPANY_NAME ${APP_COMPANY_NAME})
   set(APP_VERSION ${APP_VERSION_MAJOR}.${APP_VERSION_MINOR})
-  set(APP_PACKAGE ${APP_APP_PACKAGE})
-  string(REPLACE "." "/" APP_PACKAGE_DIR ${APP_APP_PACKAGE})
   if(APP_VERSION_TAG)
     set(APP_VERSION ${APP_VERSION}-${APP_VERSION_TAG})
     string(TOLOWER ${APP_VERSION_TAG} APP_VERSION_TAG_LC)
@@ -648,3 +679,4 @@ macro(core_find_versions)
     message(FATAL_ERROR "Could not determine add-on API version! Make sure that ${CORE_SOURCE_DIR}/xbmc/addons/kodi-addon-dev-kit/include/kodi/libKODI_guilib.h exists")
   endif()
 endmacro()
+

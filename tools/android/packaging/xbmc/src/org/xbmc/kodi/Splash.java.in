@@ -1,4 +1,4 @@
-package @APP_PACKAGE@;
+package org.xbmc.@APP_NAME_LC@;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -425,7 +425,7 @@ public class Splash extends Activity {
     ((TextView) myAlertDialog.findViewById(android.R.id.message))
         .setMovementMethod(LinkMovementMethod.getInstance());
   }
-
+  
   private void SetupEnvironment() {
     File fProp = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/xbmc_env.properties");
     if (fProp.exists()) {
@@ -607,7 +607,7 @@ public class Splash extends Activity {
       Matcher m = reMount.matcher(Mounts[i]);
       if (m.find()) {
         if (m.group(1).startsWith("/dev/block/vold") && !m.group(2).startsWith("/mnt/secure/asec")) {
-          Log.d(TAG, "adding mount: " + m.group(2));
+          Log.d(TAG, "addind mount: " + m.group(2));
           mMounts.add(m.group(2));
         }
       }
@@ -657,7 +657,7 @@ public class Splash extends Activity {
   protected void startXBMC() {
     // Run @APP_NAME@
     Intent intent = getIntent();
-    intent.setClass(this, @APP_PACKAGE@.Main.class);
+    intent.setClass(this, org.xbmc.@APP_NAME_LC@.Main.class);
     intent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
     startActivity(intent);
     finish();
@@ -674,7 +674,7 @@ public class Splash extends Activity {
         .getRunningTasks(Integer.MAX_VALUE);
     for (RunningTaskInfo task : tasks)
       if (task.topActivity.toString().equalsIgnoreCase(
-          "ComponentInfo{@APP_PACKAGE@/@APP_PACKAGE@.Main}")) {
+          "ComponentInfo{org.xbmc.@APP_NAME_LC@/org.xbmc.@APP_NAME_LC@.Main}")) {
         // @APP_NAME@ already running; just activate it
         startXBMC();
         return;
